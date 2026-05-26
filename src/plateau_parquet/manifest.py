@@ -9,7 +9,7 @@ their data — e.g. "63% of buildings in Shibuya have a year_built attribute".
 from __future__ import annotations
 
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import geopandas as gpd
@@ -77,7 +77,7 @@ def build_manifest(
         )
     return Manifest(
         tool_version=__version__,
-        generated_at=datetime.now(tz=timezone.utc),
+        generated_at=datetime.now(tz=UTC),
         city_code=catalog.city_code,
         city_name=catalog.city_name,
         dataset_year=catalog.dataset_year,

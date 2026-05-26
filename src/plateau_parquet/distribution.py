@@ -50,7 +50,7 @@ import subprocess
 import tarfile
 import tempfile
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
@@ -304,7 +304,7 @@ def merge_into_index(index_path: Path, bundle: CityBundle) -> dict:
         idx = json.loads(index_path.read_text())
     else:
         idx = {"schema": 1, "updated": "", "cities": []}
-    idx["updated"] = datetime.now(tz=timezone.utc).isoformat()
+    idx["updated"] = datetime.now(tz=UTC).isoformat()
     idx["cities"] = [
         c for c in idx["cities"]
         if not (c["city_code"] == bundle.city_code and c["dataset_year"] == bundle.dataset_year)

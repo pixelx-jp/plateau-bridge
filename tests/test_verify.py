@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import geopandas as gpd
@@ -26,7 +26,7 @@ def _make_bundle(tmp_path: Path, rows: list[dict]) -> Path:
     gdf.to_parquet(out / "buildings.parquet", index=False)
     manifest = Manifest(
         tool_version=__version__,
-        generated_at=datetime.now(tz=timezone.utc),
+        generated_at=datetime.now(tz=UTC),
         city_code="99999",
         dataset_year=2024,
         n_buildings=len(rows),
