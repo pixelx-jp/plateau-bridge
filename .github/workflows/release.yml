@@ -12,8 +12,8 @@ jobs:
       name: pypi
       url: https://pypi.org/p/plateau-bridge
     permissions:
-      id-token: write  # trusted publishing
-      contents: read
+      id-token: write  # trusted publishing (OIDC for PyPI)
+      contents: write  # create GitHub Release + attach build artifacts
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6

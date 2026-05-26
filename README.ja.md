@@ -17,8 +17,8 @@
 
 🇬🇧 [English README](README.md)
 
-[![PyPI](https://img.shields.io/badge/pypi-coming_soon-blue)](#)
-[![CI](https://img.shields.io/badge/ci-passing-brightgreen.svg)](#)
+[![PyPI](https://img.shields.io/pypi/v/plateau-bridge.svg)](https://pypi.org/project/plateau-bridge/)
+[![CI](https://github.com/pixelx-jp/plateau-bridge/actions/workflows/ci.yml/badge.svg)](https://github.com/pixelx-jp/plateau-bridge/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-orange.svg)](#attribution)
 [![Yodo Labs](https://img.shields.io/badge/by-Yodo%20Labs-111111.svg)](https://yodolabs.jp)
