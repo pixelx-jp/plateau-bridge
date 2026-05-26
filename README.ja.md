@@ -7,7 +7,7 @@
   </picture>
 </a>
 
-# plateau-parquet
+# plateau-bridge
 
 **[Project PLATEAU](https://www.mlit.go.jp/plateau/) のための、信頼性の高い建物データ整備＋ハザード重畳パイプライン。**
 
@@ -39,7 +39,7 @@
 
 PLATEAU は精密な3D都市モデルを公開していますが、生データは **CityGML XML・3D Tiles・MVT が数十のファイルと整備年度ごとに分散** しています。たとえば *「渋谷区にある、1981年より前に建てられた木造建物で、洪水浸水想定区域に重なるものを全部見せて」* といった問いに答えるには、通常は数時間の前処理が必要です。
 
-`plateau-parquet` はこれを **1行** で実現します:
+`plateau-bridge` はこれを **1行** で実現します:
 
 ```python
 import duckdb
@@ -100,7 +100,7 @@ river_flood_hit_source_ids     # 実際にヒットしたソース
 
 ### カバレッジ精度のさらなる向上に貢献するには
 
-`explicit_polygon`（`inundation_bounded` の1段階上）を流域単位で有効化するには、[`src/plateau_parquet/data/coverage_sources.json`](src/plateau_parquet/data/coverage_sources.json) に PLATEAU の出典ドキュメント文字列と MLIT KSJ URL のマッピングを1行追加してください:
+`explicit_polygon`（`inundation_bounded` の1段階上）を流域単位で有効化するには、[`src/plateau_bridge/data/coverage_sources.json`](src/plateau_bridge/data/coverage_sources.json) に PLATEAU の出典ドキュメント文字列と MLIT KSJ URL のマッピングを1行追加してください:
 
 ```jsonc
 {
@@ -117,7 +117,7 @@ river_flood_hit_source_ids     # 実際にヒットしたソース
 ## アーキテクチャ
 
 ```
-plateau_parquet/
+plateau_bridge/
 ├── catalog.py       # PLATEAU データカタログ API クライアント
 ├── schema.py        # Pydantic モデル: Building, HazardField, Manifest
 ├── sources/         # 各ソース形式の入出力
@@ -142,7 +142,7 @@ plateau_parquet/
 ## クイックスタート · ビルド不要
 
 ```bash
-pip install plateau-parquet
+pip install plateau-bridge
 plateau cache add shibuya                          # ⚡ ~36 MB、sha256 検証済み
 duckdb -c "SELECT count(*) FROM 'out_shibuya/buildings.parquet'"
 # 41858
@@ -244,7 +244,7 @@ ORDER BY river_flood_depth_max DESC;
 次のような場合にこの手順を使います: 特定の `dataset_year` が必要な場合、新しい都市をカタログに追加する場合、またはビルド済みバンドルをビット単位で検証したい場合。
 
 ```bash
-pip install 'plateau-parquet[all]'        # + PMTiles + 3D Tiles metadata + posters
+pip install 'plateau-bridge[all]'        # + PMTiles + 3D Tiles metadata + posters
 
 # プラス、ネイティブバイナリ2つを $PATH 上に:
 #   nusamai     — Rust 製 CityGML コンバータ (PLATEAU i-UR 拡張のパース)
@@ -306,7 +306,7 @@ PNG / SVG / PDF では隅にウォーターマーク、GLB では `asset.extras.
 
 ## About
 
-`plateau-parquet` は **[Yodo Labs](https://yodolabs.jp)** — *映像と現場業務をつなぐインテリジェンス・レイヤー* — が開発・保守しています。お問い合わせ: [pan@yodolabs.jp](mailto:pan@yodolabs.jp).
+`plateau-bridge` は **[Yodo Labs](https://yodolabs.jp)** — *映像と現場業務をつなぐインテリジェンス・レイヤー* — が開発・保守しています。お問い合わせ: [pan@yodolabs.jp](mailto:pan@yodolabs.jp).
 
 <div align="center">
   <br>

@@ -11,7 +11,7 @@ from __future__ import annotations
 import geopandas as gpd
 from shapely.geometry import Polygon
 
-from plateau_parquet.ops.attributes import field_coverage, normalise
+from plateau_bridge.ops.attributes import field_coverage, normalise
 
 
 def _row(geom: Polygon, **props):

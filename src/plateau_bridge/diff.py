@@ -31,7 +31,7 @@ from pathlib import Path
 
 import geopandas as gpd
 
-from plateau_parquet.schema import DEPTH_HAZARDS, HazardKind
+from plateau_bridge.schema import DEPTH_HAZARDS, HazardKind
 
 log = logging.getLogger(__name__)
 

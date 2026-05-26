@@ -12,7 +12,7 @@ from pathlib import Path
 
 import geopandas as gpd
 
-from plateau_parquet.sources.citygml import convert_buildings
+from plateau_bridge.sources.citygml import convert_buildings
 
 log = logging.getLogger(__name__)
 

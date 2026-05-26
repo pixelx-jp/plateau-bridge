@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from plateau_parquet.ops.tiles3d import list_contents, walk_tileset
+from plateau_bridge.ops.tiles3d import list_contents, walk_tileset
 
 
 def test_walk_nested_external_tileset(tmp_path: Path) -> None:

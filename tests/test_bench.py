@@ -8,7 +8,7 @@ import geopandas as gpd
 import pyarrow as pa  # noqa: F401  (ensure pyarrow available)
 from shapely.geometry import Polygon
 
-from plateau_parquet.bench import run_suite
+from plateau_bridge.bench import run_suite
 
 
 def _make_minimal_parquet(path: Path, n: int = 100) -> None:

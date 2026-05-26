@@ -20,7 +20,7 @@ import duckdb
 import geopandas as gpd
 
 ROOT = Path(__file__).resolve().parent.parent
-ADMIN = ROOT / "src" / "plateau_parquet" / "data" / "japan_admin.geojson"
+ADMIN = ROOT / "src" / "plateau_bridge" / "data" / "japan_admin.geojson"
 EXAMPLES = ROOT / "examples"
 DEMOS = ("browser_colorby", "browser_cesium", "browser_deckgl")
 

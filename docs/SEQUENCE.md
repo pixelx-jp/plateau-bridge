@@ -9,7 +9,7 @@ sequenceDiagram
     participant CLI as plateau (Typer)
     participant Catalog
     participant Download as sources.download
-    participant Admin as plateau_parquet.admin
+    participant Admin as plateau_bridge.admin
     participant Nusamai as nusamai (CLI)
     participant LoadGJ as sources.citygml.load_geojson
     participant Norm as ops.attributes.normalise

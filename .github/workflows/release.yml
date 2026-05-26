@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/plateau-parquet
+      url: https://pypi.org/p/plateau-bridge
     permissions:
       id-token: write  # trusted publishing
       contents: read

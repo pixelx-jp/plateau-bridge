@@ -1,5 +1,5 @@
 /**
- * deck.gl Tile3DLayer demo for plateau-parquet Gate B output.
+ * deck.gl Tile3DLayer demo for plateau-bridge Gate B output.
  *
  * PLATEAU 3D Tiles are in ECEF (Cesium 3D Tiles 1.1). deck.gl's Tile3DLayer
  * handles the geographic transform automatically — what we need is just a

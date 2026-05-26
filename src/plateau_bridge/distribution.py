@@ -56,13 +56,13 @@ from pathlib import Path
 import httpx
 from tqdm import tqdm
 
-from plateau_parquet import __version__
-from plateau_parquet.config import load_settings
+from plateau_bridge import __version__
+from plateau_bridge.config import load_settings
 
 log = logging.getLogger(__name__)
 
 DEFAULT_INDEX_URL = (
-    "https://raw.githubusercontent.com/pixelx-jp/plateau-parquet/main/distribution/index.json"
+    "https://raw.githubusercontent.com/pixelx-jp/plateau-bridge/main/distribution/index.json"
 )
 
 # Files packaged into a bundle. 3D Tiles are deliberately omitted.

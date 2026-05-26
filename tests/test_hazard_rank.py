@@ -12,8 +12,8 @@ import json
 import geopandas as gpd
 from shapely.geometry import Polygon
 
-from plateau_parquet.schema import HazardKind
-from plateau_parquet.sources.hazard import (
+from plateau_bridge.schema import HazardKind
+from plateau_bridge.sources.hazard import (
     RANK_LABEL_TO_METERS,
     _extract_rank_from_attr,
     normalise_depth,

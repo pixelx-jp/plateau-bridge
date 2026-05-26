@@ -7,7 +7,7 @@
   </picture>
 </a>
 
-# plateau-parquet
+# plateau-bridge
 
 **A trustworthy building indexing and hazard-intersection pipeline for [Project PLATEAU](https://www.mlit.go.jp/plateau/).**
 
@@ -42,7 +42,7 @@ Turns Japan's 3D city models into a single `buildings.parquet` ready for SQL and
 
 PLATEAU publishes detailed 3D city models, but the raw data is **CityGML XML, 3D Tiles, and MVT spread across dozens of files and dataset years**. Answering a question like *"show me every wooden building in Shibuya built before 1981 that overlaps a flood zone"* typically takes hours of preprocessing.
 
-`plateau-parquet` answers it in **one line**:
+`plateau-bridge` answers it in **one line**:
 
 ```python
 import duckdb
@@ -108,7 +108,7 @@ All 29 cities currently resolve to `inundation_bounded` (PLATEAU bundles per-bui
 
 ### Contributing to coverage upgrades
 
-To unlock `explicit_polygon` (one tier stronger than `inundation_bounded`) for a watershed, add a row to [`src/plateau_parquet/data/coverage_sources.json`](src/plateau_parquet/data/coverage_sources.json) mapping each PLATEAU source-document string to the corresponding MLIT KSJ URL:
+To unlock `explicit_polygon` (one tier stronger than `inundation_bounded`) for a watershed, add a row to [`src/plateau_bridge/data/coverage_sources.json`](src/plateau_bridge/data/coverage_sources.json) mapping each PLATEAU source-document string to the corresponding MLIT KSJ URL:
 
 ```jsonc
 {
@@ -125,7 +125,7 @@ To unlock `explicit_polygon` (one tier stronger than `inundation_bounded`) for a
 ## Architecture
 
 ```
-plateau_parquet/
+plateau_bridge/
 ├── catalog.py       # PLATEAU Data Catalog API client
 ├── schema.py        # Pydantic models: Building, HazardField, Manifest
 ├── sources/         # I/O for each source format
@@ -150,7 +150,7 @@ Each `Gate` is independently verifiable; a failure in Gate A blocks `colorBy` sh
 ## Quick start · no build required
 
 ```bash
-pip install plateau-parquet
+pip install plateau-bridge
 plateau cache add shibuya                          # ⚡ ~36 MB, sha256-verified
 duckdb -c "SELECT count(*) FROM 'out_shibuya/buildings.parquet'"
 # 41858
@@ -210,7 +210,7 @@ a new city to the catalog, or you want to verify the pre-built
 bundles bit-for-bit.
 
 ```bash
-pip install 'plateau-parquet[all]'        # + PMTiles + 3D Tiles metadata + posters
+pip install 'plateau-bridge[all]'        # + PMTiles + 3D Tiles metadata + posters
 
 # Plus two native binaries on $PATH:
 #   nusamai     — the Rust CityGML converter (parses PLATEAU's i-UR extensions)
@@ -308,7 +308,7 @@ Both fixes are defensive — clean cities are untouched.
 
 
 
-PLATEAU bundles are prefecture-wide. `plateau-parquet` ships admin polygons (Tokyo wards from [dataofjapan/land](https://github.com/dataofjapan/land); 大阪市 dissolved from MLIT 国土数値情報 N03) and clips at build time, so `buildings.parquet` actually matches its `city_code`:
+PLATEAU bundles are prefecture-wide. `plateau-bridge` ships admin polygons (Tokyo wards from [dataofjapan/land](https://github.com/dataofjapan/land); 大阪市 dissolved from MLIT 国土数値情報 N03) and clips at build time, so `buildings.parquet` actually matches its `city_code`:
 
 | Metric | 渋谷区 (13113) | 新宿区 (13104) | 大阪市 (27100) |
 |---|---|---|---|
@@ -465,7 +465,7 @@ For PNG/SVG/PDF this is a corner watermark; for GLB it's in `asset.extras.attrib
 
 This is a young project and we want help. High-leverage places to start:
 
-1. **Add a new city's recipe** under `plateau_parquet/catalog.py` and open a PR with the `manifest.json` it produces — see [docs/ADDING_A_CITY.md](docs/ADDING_A_CITY.md).
+1. **Add a new city's recipe** under `plateau_bridge/catalog.py` and open a PR with the `manifest.json` it produces — see [docs/ADDING_A_CITY.md](docs/ADDING_A_CITY.md).
 2. **Improve hazard coverage extent** for cities where the source dataset is ambiguous (see `sources/coverage.py` TODOs); upgrading `declared_full_admin` → `explicit_polygon` is a meaningful data-quality win.
 3. **Custom deck.gl loader** — bypass loaders.gl's `arrayOffsets for strings` bug so the deck.gl demo can shade per-feature like the three.js demo. See [`examples/browser_deckgl/README.md`](examples/browser_deckgl/README.md) for the current workaround and contract.
 
@@ -477,7 +477,7 @@ Code: MIT. Data: CC BY 4.0 (inherited from PLATEAU).
 
 ## About
 
-`plateau-parquet` is built and maintained by **[Yodo Labs](https://yodolabs.jp)** — *the intelligence layer between imagery and real-world operations*. Contact: [pan@yodolabs.jp](mailto:pan@yodolabs.jp).
+`plateau-bridge` is built and maintained by **[Yodo Labs](https://yodolabs.jp)** — *the intelligence layer between imagery and real-world operations*. Contact: [pan@yodolabs.jp](mailto:pan@yodolabs.jp).
 
 <div align="center">
   <br>

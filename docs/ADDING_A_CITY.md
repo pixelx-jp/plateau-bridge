@@ -1,6 +1,6 @@
 # Adding a city to the bundled catalog
 
-This is the highest-leverage way to contribute to plateau-parquet. Most cities
+This is the highest-leverage way to contribute to plateau-bridge. Most cities
 just need a JSON entry. Walkthrough below uses **横浜市 14100** as the example.
 
 ## 1. Find the CKAN URL
@@ -22,14 +22,14 @@ year first; fall back to earlier years if missing.
 ## 2. Check the admin polygon
 
 ```bash
-python -c "from plateau_parquet.admin import load_admin; print(load_admin('14100'))"
+python -c "from plateau_bridge.admin import load_admin; print(load_admin('14100'))"
 ```
 
 If `None`, add it from MLIT 国土数値情報 N03 — see step 4 below.
 
 ## 3. Add a catalog entry
 
-Append to `src/plateau_parquet/catalog_registry.json`:
+Append to `src/plateau_bridge/catalog_registry.json`:
 
 ```jsonc
 {
@@ -72,9 +72,9 @@ city['city_code'] = '14100'
 city['ward_ja'] = '横浜市'
 city['ward_en'] = 'Yokohama-shi'
 city = city.dissolve(by='city_code', as_index=False)[['city_code','ward_ja','ward_en','geometry']]
-existing = gpd.read_file('src/plateau_parquet/data/japan_admin.geojson')
+existing = gpd.read_file('src/plateau_bridge/data/japan_admin.geojson')
 combined = gpd.GeoDataFrame(pd.concat([existing, city], ignore_index=True), crs='EPSG:4326')
-combined.to_file('src/plateau_parquet/data/japan_admin.geojson', driver='GeoJSON')
+combined.to_file('src/plateau_bridge/data/japan_admin.geojson', driver='GeoJSON')
 PY
 ```
 

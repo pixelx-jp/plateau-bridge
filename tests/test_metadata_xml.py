@@ -9,7 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 from textwrap import dedent
 
-from plateau_parquet.sources.metadata_xml import (
+from plateau_bridge.sources.metadata_xml import (
     canonicalise_source_document,
     find_metadata_files,
     parse_metadata_xml,

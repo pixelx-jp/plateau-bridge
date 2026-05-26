@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to plateau-parquet. We follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+All notable changes to plateau-bridge. We follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and Semantic Versioning.
 
 ## [Unreleased]
@@ -185,7 +185,7 @@ unique `(tile_content_uri, tile_feature_id)` joint key) across 875 unique
 
 ### Added (this iteration)
 
-- `plateau_parquet.admin` — bundled Tokyo ward admin polygons (`tokyo_admin.geojson`,
+- `plateau_bridge.admin` — bundled Tokyo ward admin polygons (`tokyo_admin.geojson`,
   derived from `dataofjapan/land` MIT) with `load_admin(city_code)`.
 - `plateau build --admin <path>` / `--no-admin` flags.
 - Gate A now clips buildings to admin boundary by default (when the bundled
@@ -215,7 +215,7 @@ End-to-end Gate A run on **PLATEAU Shibuya 2023** (`13113_shibuya-ku_pref_2023_c
 - Real PLATEAU Shibuya 2023 has 0% `yearOfConstruction` / `buildingStructureType` populated; `poster --color-by height` is the appropriate visual.
 
 ### Added
-- `plateau verify` subcommand and `plateau_parquet.verify` module — schema /
+- `plateau verify` subcommand and `plateau_bridge.verify` module — schema /
   honesty / UID-uniqueness / manifest cross-consistency checks in one call.
 - `plateau poster` subcommand — Building Age Rainbow PNG/SVG poster
   generator using matplotlib. Requires the `[poster]` extra.

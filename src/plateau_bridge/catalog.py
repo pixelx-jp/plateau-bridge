@@ -17,7 +17,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from plateau_parquet.schema import HazardKind
+from plateau_bridge.schema import HazardKind
 
 Theme = Literal["building", "zoning", "hazard"]
 
@@ -76,7 +76,7 @@ def load_registry() -> dict[tuple[str, int], CityCatalog]:
     Returns an empty dict if the file is absent (lets users add cities incrementally).
     """
     try:
-        raw = files("plateau_parquet").joinpath("catalog_registry.json").read_text(encoding="utf-8")
+        raw = files("plateau_bridge").joinpath("catalog_registry.json").read_text(encoding="utf-8")
     except (FileNotFoundError, ModuleNotFoundError):
         return {}
     data = json.loads(raw)

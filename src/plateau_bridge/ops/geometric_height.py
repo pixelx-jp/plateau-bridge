@@ -205,7 +205,7 @@ def compute_tileset_heights(
     """
     # Resolve which GLBs to walk. Without an explicit list, prefer LOD18.
     if glb_relative_uris is None:
-        from plateau_parquet.ops.tiles3d import list_contents
+        from plateau_bridge.ops.tiles3d import list_contents
         all_uris = list_contents(tileset_dir)
         # PLATEAU paths are "<lod>/x/y_..._Building.glb".
         max_lod = -1

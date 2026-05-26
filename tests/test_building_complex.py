@@ -5,7 +5,7 @@ from __future__ import annotations
 import geopandas as gpd
 from shapely.geometry import Polygon
 
-from plateau_parquet.ops.building_complex import compute_complexes
+from plateau_bridge.ops.building_complex import compute_complexes
 
 
 def _bldg(x: float, y: float, w: float, h: float, *, uid: str, height: float) -> dict:

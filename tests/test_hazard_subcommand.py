@@ -10,12 +10,12 @@ import geopandas as gpd
 import pytest
 from shapely.geometry import Polygon
 
-from plateau_parquet.catalog import CityCatalog, DatasetEntry
-from plateau_parquet.pipeline import hazard_only as ho_module
-from plateau_parquet.pipeline.hazard_only import run_hazard_only
-from plateau_parquet.schema import CoverageConfidence, HazardKind
-from plateau_parquet.sources.coverage import CoverageExtent
-from plateau_parquet.sources.hazard import HazardLayer
+from plateau_bridge.catalog import CityCatalog, DatasetEntry
+from plateau_bridge.pipeline import hazard_only as ho_module
+from plateau_bridge.pipeline.hazard_only import run_hazard_only
+from plateau_bridge.schema import CoverageConfidence, HazardKind
+from plateau_bridge.sources.coverage import CoverageExtent
+from plateau_bridge.sources.hazard import HazardLayer
 
 
 def _polygon(x: float, y: float, size: float = 0.01) -> Polygon:

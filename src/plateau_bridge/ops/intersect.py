@@ -32,9 +32,9 @@ from collections.abc import Iterable
 import geopandas as gpd
 import numpy as np
 
-from plateau_parquet.schema import DEPTH_HAZARDS, HazardKind
-from plateau_parquet.sources.coverage import CoverageExtent
-from plateau_parquet.sources.hazard import HazardLayer
+from plateau_bridge.schema import DEPTH_HAZARDS, HazardKind
+from plateau_bridge.sources.coverage import CoverageExtent
+from plateau_bridge.sources.hazard import HazardLayer
 
 log = logging.getLogger(__name__)
 

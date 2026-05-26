@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from plateau_parquet.admin import _bundled_admin, load_admin
+from plateau_bridge.admin import _bundled_admin, load_admin
 
 
 def test_bundled_admin_loads() -> None:
@@ -17,7 +17,7 @@ def test_bundled_admin_loads() -> None:
 
 def test_all_catalog_cities_have_admin() -> None:
     """Every city in the bundled catalog must have a usable admin polygon."""
-    from plateau_parquet.catalog import load_registry
+    from plateau_bridge.catalog import load_registry
     for (code, _year), _cat in load_registry().items():
         g = load_admin(code)
         assert g is not None, f"missing admin polygon for catalog city {code}"
@@ -53,7 +53,7 @@ def test_bundled_admin_polygons_are_unionable() -> None:
     Edogawa (and any future similar case) silently breaks Gate A
     again.
     """
-    from plateau_parquet.catalog import load_registry
+    from plateau_bridge.catalog import load_registry
     for (code, _year), _cat in load_registry().items():
         g = load_admin(code)
         assert g is not None

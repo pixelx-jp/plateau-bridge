@@ -42,7 +42,7 @@ A single JSON file lists every available bundle:
       "city_code": "13113",
       "city_name": "Shibuya-ku",
       "dataset_year": 2023,
-      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13113-2023-v1.tar.zst",
+      "bundle_url": "https://github.com/pixelx-jp/plateau-bridge/releases/download/data-v1/plateau-13113-2023-v1.tar.zst",
       "sha256": "dbe43d4c1a6dd5092a671b2cc06c2a8f7f860f3f01285d973db2e06899005bde",
       "bytes": 37709760,
       "n_buildings": 41858,
@@ -55,7 +55,7 @@ A single JSON file lists every available bundle:
 Default index URL is hard-coded to this repo's `main` branch:
 
 ```python
-DEFAULT_INDEX_URL = "https://raw.githubusercontent.com/pixelx-jp/plateau-parquet/main/distribution/index.json"
+DEFAULT_INDEX_URL = "https://raw.githubusercontent.com/pixelx-jp/plateau-bridge/main/distribution/index.json"
 ```
 
 Override per-invocation: `plateau cache add 13113 --index https://...`
@@ -78,7 +78,7 @@ trust root, and the index lives in version control.
 plateau build 14100 --out ./out_yokohama
 
 # 2. Pack + push to a draft GitHub release.
-gh release create data-v1 --title "plateau-parquet bundles v1" --notes "Pre-built city data"   # one-time
+gh release create data-v1 --title "plateau-bridge bundles v1" --notes "Pre-built city data"   # one-time
 plateau cache push ./out_yokohama --backend github-releases --tag data-v1
 
 # 3. Commit the updated index.

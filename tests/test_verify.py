@@ -8,15 +8,15 @@ from pathlib import Path
 import geopandas as gpd
 from shapely.geometry import Polygon
 
-from plateau_parquet import __version__
-from plateau_parquet.schema import (
+from plateau_bridge import __version__
+from plateau_bridge.schema import (
     CoverageConfidence,
     CoverageStats,
     HazardKind,
     Manifest,
     SourceRef,
 )
-from plateau_parquet.verify import verify
+from plateau_bridge.verify import verify
 
 
 def _make_bundle(tmp_path: Path, rows: list[dict]) -> Path:

@@ -1,10 +1,10 @@
 cff-version: 1.2.0
-title: "plateau-parquet: a trustworthy building index and hazard intersection pipeline for Project PLATEAU"
+title: "plateau-bridge: a trustworthy building index and hazard intersection pipeline for Project PLATEAU"
 message: "If you use this software, please cite it."
 type: software
 authors:
-  - name: "plateau-parquet contributors"
-repository-code: "https://github.com/pixelx-jp/plateau-parquet"
+  - name: "plateau-bridge contributors"
+repository-code: "https://github.com/pixelx-jp/plateau-bridge"
 license: MIT
 version: 0.1.0
 date-released: 2026-05-23

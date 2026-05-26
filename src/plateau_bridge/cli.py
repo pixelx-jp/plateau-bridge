@@ -18,11 +18,11 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from plateau_parquet import __version__
-from plateau_parquet.catalog import load_registry, resolve_city
-from plateau_parquet.config import load_settings
-from plateau_parquet.pipeline import run_gate_a, run_gate_b, run_gate_c
-from plateau_parquet.verify import verify as verify_bundle
+from plateau_bridge import __version__
+from plateau_bridge.catalog import load_registry, resolve_city
+from plateau_bridge.config import load_settings
+from plateau_bridge.pipeline import run_gate_a, run_gate_b, run_gate_c
+from plateau_bridge.verify import verify as verify_bundle
 
 
 @lru_cache(maxsize=1)
@@ -39,7 +39,7 @@ def _completion_table() -> tuple[tuple[str, str], ...]:
         reg = load_registry()
     except Exception:  # noqa: BLE001
         return tuple()
-    from plateau_parquet.catalog import _SLUG_TO_CODE
+    from plateau_bridge.catalog import _SLUG_TO_CODE
     code_to_slug = {code: slug for slug, code in _SLUG_TO_CODE.items()}
     seen: dict[str, tuple[int, str]] = {}
     for (code, year), cat in reg.items():
@@ -71,7 +71,7 @@ def _complete_city(incomplete: str) -> list[tuple[str, str]]:
 def _complete_gates(incomplete: str) -> list[str]:
     return [g for g in ("A", "B", "C", "AB", "BC", "ABC") if g.startswith(incomplete)]
 
-app = typer.Typer(help="plateau-parquet: a trustworthy PLATEAU pipeline")
+app = typer.Typer(help="plateau-bridge: a trustworthy PLATEAU pipeline")
 cache_app = typer.Typer(help="Manage the on-disk cache")
 app.add_typer(cache_app, name="cache")
 console = Console()
@@ -85,7 +85,7 @@ def main(verbose: bool = typer.Option(False, "-v", "--verbose")) -> None:
 @app.command()
 def version() -> None:
     """Print version."""
-    console.print(f"plateau-parquet {__version__}")
+    console.print(f"plateau-bridge {__version__}")
 
 
 @app.command()
@@ -160,7 +160,7 @@ def build(
         if no_admin:
             pass  # explicit opt-out
         elif admin is not None:
-            from plateau_parquet.admin import load_admin_from_path
+            from plateau_bridge.admin import load_admin_from_path
             admin_arg = load_admin_from_path(admin)
         a_result = run_gate_a(
             catalog, out, emit_3dtiles=not skip_3dtiles, admin_boundary=admin_arg,
@@ -184,9 +184,9 @@ def build(
         if not (tiles_dir / "tileset.json").exists():
             # Re-emit 3D Tiles via nusamai; Gate A's converter is idempotent.
             console.print("[yellow]3D Tiles not cached; running nusamai 3dtiles sink (~5–30 min)[/yellow]")
-            from plateau_parquet.config import load_settings
-            from plateau_parquet.sources.citygml import convert_buildings
-            from plateau_parquet.sources.download import fetch_and_unzip
+            from plateau_bridge.config import load_settings
+            from plateau_bridge.sources.citygml import convert_buildings
+            from plateau_bridge.sources.download import fetch_and_unzip
             settings = load_settings()
             bldg_entry = catalog.building()
             bldg_root = fetch_and_unzip(bldg_entry.url, settings.cache_dir / "datasets")
@@ -222,8 +222,8 @@ def build(
         console.print(f"  → {c_result.pmtiles_path}, {len(c_result.fgb_paths)} FGB shard(s)")
 
     if prune_cache:
-        from plateau_parquet.config import load_settings
-        from plateau_parquet.sources.download import cache_path_for_url
+        from plateau_bridge.config import load_settings
+        from plateau_bridge.sources.download import cache_path_for_url
         settings = load_settings()
         datasets_root = settings.cache_dir / "datasets"
         freed_bytes = 0
@@ -260,9 +260,9 @@ def poster(
 ) -> None:
     """Render the Building Age Rainbow poster (requires the `poster` extra)."""
     try:
-        from plateau_parquet.poster import render_age_rainbow
+        from plateau_bridge.poster import render_age_rainbow
     except ImportError as e:
-        console.print(f"[red]matplotlib not installed:[/red] {e}\nTry `pip install 'plateau-parquet[poster]'`.")
+        console.print(f"[red]matplotlib not installed:[/red] {e}\nTry `pip install 'plateau-bridge[poster]'`.")
         raise typer.Exit(1) from e
     bbox_tup = None
     if bbox:
@@ -295,7 +295,7 @@ def hazard(
     the hazard sjoin dominates wall-clock time. Re-uses cached hazard GeoJSON
     when present (the ``_work/hzd_*`` dirs the original build wrote).
     """
-    from plateau_parquet.pipeline.hazard_only import run_hazard_only
+    from plateau_bridge.pipeline.hazard_only import run_hazard_only
     registry = load_registry()
     key_year = year if year is not None else max(k[1] for k in registry if k[0] == city)
     catalog = registry[(city, key_year)]
@@ -314,7 +314,7 @@ def diff(
     Reports: matched count, only-in-A (gone), only-in-B (new), and per-hazard
     deltas (newly_covered / newly_hit / no_longer_hit / depth_grew/shrank).
     """
-    from plateau_parquet.diff import diff as compute_diff
+    from plateau_bridge.diff import diff as compute_diff
     rep = compute_diff(a, b)
     console.print(
         f"[bold]plateau diff[/bold]  match_key=[cyan]{rep.match_key}[/cyan]\n"
@@ -349,7 +349,7 @@ def bench(
     warmup: int = typer.Option(1, "--warmup", help="Untimed warmup runs per query"),
 ) -> None:
     """Benchmark the canonical DuckDB query suite against a buildings.parquet."""
-    from plateau_parquet.bench import run_suite
+    from plateau_bridge.bench import run_suite
     results = run_suite(parquet, iterations=iterations, warmup=warmup)
     table = Table(title=f"Bench · {parquet} · n={iterations}")
     table.add_column("query")
@@ -410,11 +410,11 @@ def cache_add(
 ) -> None:
     """Download a pre-built city bundle (skip the build pipeline).
 
-    The default index points at the plateau-parquet GitHub Releases mirror.
+    The default index points at the plateau-bridge GitHub Releases mirror.
     See docs/DATA.md for distribution strategy and docs/DISTRIBUTION.md
     for maintainer-side push instructions.
     """
-    from plateau_parquet.distribution import DEFAULT_INDEX_URL, add
+    from plateau_bridge.distribution import DEFAULT_INDEX_URL, add
     try:
         city = resolve_city(city)
     except KeyError as e:
@@ -442,7 +442,7 @@ def cache_push(
     Maintainers only — produces a tarball and inserts it into the cache
     index JSON. End users use `cache add` instead.
     """
-    from plateau_parquet.distribution import merge_into_index, push
+    from plateau_bridge.distribution import merge_into_index, push
     bundle = push(out_dir, backend=backend, release_tag=release_tag, dry_run=dry_run)
     merge_into_index(index_path, bundle)
     console.print(f"  → {bundle.bundle_url}")

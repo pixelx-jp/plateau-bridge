@@ -10,10 +10,10 @@ from __future__ import annotations
 import geopandas as gpd
 from shapely.geometry import Polygon
 
-from plateau_parquet.ops.intersect import apply_coverage, apply_hazards
-from plateau_parquet.schema import CoverageConfidence, HazardKind
-from plateau_parquet.sources.coverage import CoverageExtent
-from plateau_parquet.sources.hazard import HazardLayer
+from plateau_bridge.ops.intersect import apply_coverage, apply_hazards
+from plateau_bridge.schema import CoverageConfidence, HazardKind
+from plateau_bridge.sources.coverage import CoverageExtent
+from plateau_bridge.sources.hazard import HazardLayer
 
 
 def _square(x: float, y: float, size: float = 0.001) -> Polygon:

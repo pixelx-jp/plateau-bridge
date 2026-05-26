@@ -67,7 +67,7 @@ URL pattern (example for A31):
 `https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-{year}/<dataset>.zip`
 
 License: KSJ ships under its own terms ("国土数値情報利用約款"). For
-plateau-parquet's open-source distribution we need to confirm
+plateau-bridge's open-source distribution we need to confirm
 redistribution permission per-KSJ-dataset, OR include only the
 *reference URL* in the catalog and have users fetch directly.
 
@@ -100,12 +100,12 @@ finite but non-trivial.
 ### Phase 1 — Scaffolding ✅ shipped 2026-05-26
 
 1. ✅ Metadata XML parser at
-   `src/plateau_parquet/sources/metadata_xml.py` — extracts source-document
+   `src/plateau_bridge/sources/metadata_xml.py` — extracts source-document
    list (free-text Japanese strings under `<descriptiveKeywords type=005>`)
    plus the JMP20 ISO-19115 bounding box and canonical title.
-2. ✅ Mapping table at `src/plateau_parquet/data/coverage_sources.json` —
+2. ✅ Mapping table at `src/plateau_bridge/data/coverage_sources.json` —
    schema-documented, ships with `entries: {}` (community-curated).
-3. ✅ Resolver at `src/plateau_parquet/sources/coverage_ksj.py`:
+3. ✅ Resolver at `src/plateau_bridge/sources/coverage_ksj.py`:
    - `load_coverage_sources()` — bundled JSON → typed dict.
    - `_fetch_ksj_polygon(url, cache_dir)` — content-addressed
      download + Shapefile/GML read, EPSG:4326.
@@ -127,7 +127,7 @@ Tests in `tests/test_coverage_ksj.py` pin:
 ### Phase 2 — Mapping table population (ongoing; community-driven)
 
 Each contributor adds 1–5 entries per PR to
-`src/plateau_parquet/data/coverage_sources.json`. **No code changes are
+`src/plateau_bridge/data/coverage_sources.json`. **No code changes are
 needed** — the JSON ships in the wheel; a row going in immediately
 upgrades any matching city on the next `plateau build` or `plateau
 hazard` run.
@@ -196,7 +196,7 @@ A 39-entry research preview (Tokyo + Osaka + Yokohama prefectural
 KSJ A31) lives at
 [`docs/coverage_sources.research-preview.json`](coverage_sources.research-preview.json).
 To experiment, copy that file into
-`src/plateau_parquet/data/coverage_sources.json` and rebuild — but read
+`src/plateau_bridge/data/coverage_sources.json` and rebuild — but read
 the caveat below before doing so.
 
 To claim a watershed: open an issue referencing the canonical

@@ -1,8 +1,8 @@
 """User-side cache for downloaded artifacts.
 
 Location resolved via ``platformdirs.user_cache_dir`` so it follows OS
-convention (~/.cache/plateau-parquet on Linux, ~/Library/Caches/plateau-parquet
-on macOS, %LOCALAPPDATA%\\plateau-parquet on Windows). Override with the
+convention (~/.cache/plateau-bridge on Linux, ~/Library/Caches/plateau-bridge
+on macOS, %LOCALAPPDATA%\\plateau-bridge on Windows). Override with the
 ``PLATEAU_CACHE_DIR`` env var. Layout::
 
     <cache_dir>/
@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from plateau_parquet.config import load_settings
+from plateau_bridge.config import load_settings
 
 
 def datasets_root() -> Path:

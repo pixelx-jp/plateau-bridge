@@ -25,8 +25,8 @@ from pathlib import Path
 
 import geopandas as gpd
 
-from plateau_parquet.catalog import DatasetEntry
-from plateau_parquet.schema import CoverageConfidence, HazardKind
+from plateau_bridge.catalog import DatasetEntry
+from plateau_bridge.schema import CoverageConfidence, HazardKind
 
 log = logging.getLogger(__name__)
 
@@ -126,8 +126,8 @@ def resolve_coverage(
 
     # 1b. KSJ auto-resolve via metadata XML + bundled mapping table.
     if dataset_root is not None:
-        from plateau_parquet.config import load_settings
-        from plateau_parquet.sources.coverage_ksj import (
+        from plateau_bridge.config import load_settings
+        from plateau_bridge.sources.coverage_ksj import (
             resolve_explicit_polygon_from_metadata,
         )
         cache = ksj_cache_dir or (load_settings().cache_dir / "ksj")

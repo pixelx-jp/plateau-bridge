@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from plateau_parquet.ops.uid import batch_uids, make_uid, parse_uid
+from plateau_bridge.ops.uid import batch_uids, make_uid, parse_uid
 
 
 def test_make_uid_roundtrip() -> None:

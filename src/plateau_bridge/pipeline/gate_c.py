@@ -15,14 +15,14 @@ from pathlib import Path
 import geopandas as gpd
 import httpx
 
-from plateau_parquet.admin import load_wards
-from plateau_parquet.catalog import CityCatalog
-from plateau_parquet.config import load_settings
-from plateau_parquet.ops.flatgeobuf import write_per_ward_fgb
-from plateau_parquet.ops.pmtiles import write_pmtiles
-from plateau_parquet.sources.citygml import convert_pmtiles
-from plateau_parquet.sources.download import fetch_and_unzip
-from plateau_parquet.sources.zoning import load_zoning
+from plateau_bridge.admin import load_wards
+from plateau_bridge.catalog import CityCatalog
+from plateau_bridge.config import load_settings
+from plateau_bridge.ops.flatgeobuf import write_per_ward_fgb
+from plateau_bridge.ops.pmtiles import write_pmtiles
+from plateau_bridge.sources.citygml import convert_pmtiles
+from plateau_bridge.sources.download import fetch_and_unzip
+from plateau_bridge.sources.zoning import load_zoning
 
 log = logging.getLogger(__name__)
 

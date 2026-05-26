@@ -107,4 +107,4 @@ follow-up.
 ## Attribution
 
 `© Project PLATEAU / MLIT (CC BY 4.0)` auto-rendered per project rules.
-plateau-parquet itself is © PixelX Inc. / Yodo Labs, MIT-licensed.
+plateau-bridge itself is © PixelX Inc. / Yodo Labs, MIT-licensed.

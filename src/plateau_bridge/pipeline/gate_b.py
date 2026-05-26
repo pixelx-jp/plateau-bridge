@@ -16,11 +16,11 @@ import geopandas as gpd
 import pandas as pd
 import pyarrow as pa
 
-from plateau_parquet.attribution import stamp_tileset_json
-from plateau_parquet.ops.building_complex import compute_complexes
-from plateau_parquet.ops.geometric_height import compute_tileset_heights
-from plateau_parquet.ops.style_table import encode_tile_uri, write_style_tables
-from plateau_parquet.ops.tiles3d import (
+from plateau_bridge.attribution import stamp_tileset_json
+from plateau_bridge.ops.building_complex import compute_complexes
+from plateau_bridge.ops.geometric_height import compute_tileset_heights
+from plateau_bridge.ops.style_table import encode_tile_uri, write_style_tables
+from plateau_bridge.ops.tiles3d import (
     attach_tile_keys,
     collect_tile_placements,
     list_contents,

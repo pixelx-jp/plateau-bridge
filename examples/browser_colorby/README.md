@@ -1,6 +1,6 @@
 # Browser `colorBy` demo (three.js / r3f)
 
-The canonical PLATEAU 3D Tiles viewer for `plateau-parquet`. Loads
+The canonical PLATEAU 3D Tiles viewer for `plateau-bridge`. Loads
 nusamai-emitted glb tiles, shades each one by **per-vertex altitude**, and
 on click resolves the picked `_FEATURE_ID_0` against the per-tile Arrow
 side-table to show curated building attributes.
@@ -102,5 +102,5 @@ answer.
 ## Attribution
 
 The demo auto-renders `© Project PLATEAU / MLIT (CC BY 4.0)` in the
-bottom right per the project's attribution rules. plateau-parquet itself
+bottom right per the project's attribution rules. plateau-bridge itself
 is © PixelX Inc. / Yodo Labs, MIT-licensed.

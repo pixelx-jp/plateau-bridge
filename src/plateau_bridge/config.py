@@ -21,7 +21,7 @@ class Settings:
 
 
 def load_settings() -> Settings:
-    cache = Path(os.environ.get("PLATEAU_CACHE_DIR") or user_cache_dir("plateau-parquet"))
+    cache = Path(os.environ.get("PLATEAU_CACHE_DIR") or user_cache_dir("plateau-bridge"))
     cache.mkdir(parents=True, exist_ok=True)
     return Settings(
         cache_dir=cache,

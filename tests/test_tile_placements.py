@@ -13,7 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
-from plateau_parquet.ops import tiles3d
+from plateau_bridge.ops import tiles3d
 
 
 def test_collect_tile_placements_preserves_all_lods(tmp_path: Path) -> None:

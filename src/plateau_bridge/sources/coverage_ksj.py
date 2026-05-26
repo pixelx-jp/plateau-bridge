@@ -36,10 +36,10 @@ import geopandas as gpd
 import pandas as pd
 import shapely
 
-from plateau_parquet.catalog import DatasetEntry
-from plateau_parquet.schema import CoverageConfidence, HazardKind
-from plateau_parquet.sources.download import fetch_and_unzip
-from plateau_parquet.sources.metadata_xml import (
+from plateau_bridge.catalog import DatasetEntry
+from plateau_bridge.schema import CoverageConfidence, HazardKind
+from plateau_bridge.sources.download import fetch_and_unzip
+from plateau_bridge.sources.metadata_xml import (
     canonicalise_source_document,
     find_metadata_files,
     parse_metadata_xml,
@@ -73,7 +73,7 @@ def load_coverage_sources() -> dict[str, KsjMapping]:
     entries — callers fall through to ``declared_full_admin`` cleanly.
     """
     try:
-        raw = files("plateau_parquet").joinpath("data", "coverage_sources.json").read_text(
+        raw = files("plateau_bridge").joinpath("data", "coverage_sources.json").read_text(
             encoding="utf-8"
         )
     except (FileNotFoundError, ModuleNotFoundError):
@@ -220,7 +220,7 @@ class _ExplicitPolygonResult:
 
     def as_coverage_extent(self, entry: DatasetEntry):
         """Wrap as a ``CoverageExtent`` matching ``sources.coverage``'s shape."""
-        from plateau_parquet.sources.coverage import CoverageExtent  # avoid cycle
+        from plateau_bridge.sources.coverage import CoverageExtent  # avoid cycle
         return CoverageExtent(
             kind=entry.hazard_kind,
             source_id=f"{entry.dataset_id}+ksj:{','.join(self.source_documents)[:80]}",

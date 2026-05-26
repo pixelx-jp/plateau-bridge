@@ -35,7 +35,7 @@ const CANDIDATES = [
 ];
 
 const BROKEN = "throw new Error('Not implemented - arrayOffsets for strings is specified');";
-const MARKER = "/* plateau-parquet: STRING[] property table columns ignored */";
+const MARKER = "/* plateau-bridge: STRING[] property table columns ignored */";
 const PATCH = `return []; ${MARKER}`;
 
 let patched = 0;

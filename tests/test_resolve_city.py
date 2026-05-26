@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from plateau_parquet.catalog import resolve_city
+from plateau_bridge.catalog import resolve_city
 
 
 def test_slug_resolves_to_jis_code() -> None:
@@ -33,7 +33,7 @@ def test_jis_code_passthrough() -> None:
 
 def test_all_29_cities_in_table() -> None:
     """Every catalog city must be resolvable by slug — no half-coverage."""
-    from plateau_parquet.catalog import _SLUG_TO_CODE, load_registry
+    from plateau_bridge.catalog import _SLUG_TO_CODE, load_registry
     catalog_codes = {code for code, _year in load_registry()}
     slug_codes = set(_SLUG_TO_CODE.values())
     missing = catalog_codes - slug_codes

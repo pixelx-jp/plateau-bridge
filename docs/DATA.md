@@ -1,10 +1,10 @@
 # Data distribution
 
-How `plateau-parquet` ships data, why, and what it costs.
+How `plateau-bridge` ships data, why, and what it costs.
 
 ## TL;DR
 
-You don't need to build anything to use plateau-parquet. Pre-built city
+You don't need to build anything to use plateau-bridge. Pre-built city
 bundles ship via GitHub Releases. One command:
 
 ```bash
@@ -55,7 +55,7 @@ official mirror is just the default.
 
 ## Distribution policy
 
-`plateau-parquet` redistributes data derived from PLATEAU. The license
+`plateau-bridge` redistributes data derived from PLATEAU. The license
 chain:
 
 - **PLATEAU source CityGML**: CC BY 4.0, MLIT (Ministry of Land,
@@ -152,10 +152,10 @@ If GitHub is blocked or you want a private mirror:
 
 ```bash
 # Pull every bundle from the official index into your S3 / R2 / disk:
-plateau cache mirror --to s3://your-bucket/plateau-parquet/
+plateau cache mirror --to s3://your-bucket/plateau-bridge/
 
 # Re-publish your own index pointing at the new location:
-plateau cache index --from s3://your-bucket/plateau-parquet/ \
+plateau cache index --from s3://your-bucket/plateau-bridge/ \
                     --out your-index.json
 
 # Downstream consumers:

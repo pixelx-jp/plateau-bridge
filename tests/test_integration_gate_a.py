@@ -17,11 +17,11 @@ import geopandas as gpd
 import pytest
 from shapely.geometry import Polygon, mapping
 
-from plateau_parquet.pipeline import gate_a as gate_a_module
-from plateau_parquet.pipeline.gate_a import run_gate_a
-from plateau_parquet.sources.citygml import ConvertResult
-from plateau_parquet.sources.hazard import HazardLayer
-from plateau_parquet.verify import verify
+from plateau_bridge.pipeline import gate_a as gate_a_module
+from plateau_bridge.pipeline.gate_a import run_gate_a
+from plateau_bridge.sources.citygml import ConvertResult
+from plateau_bridge.sources.hazard import HazardLayer
+from plateau_bridge.verify import verify
 
 
 def _make_geojson(path: Path, features: list[dict]) -> None:
@@ -112,8 +112,8 @@ def test_gate_a_end_to_end_via_fixture(
         crs="EPSG:4326",
     )
 
-    from plateau_parquet.schema import CoverageConfidence
-    from plateau_parquet.sources.coverage import CoverageExtent
+    from plateau_bridge.schema import CoverageConfidence
+    from plateau_bridge.sources.coverage import CoverageExtent
 
     def fake_resolve_coverage(entry, admin_boundary, **kw):
         return CoverageExtent(
@@ -126,8 +126,8 @@ def test_gate_a_end_to_end_via_fixture(
     monkeypatch.setattr(gate_a_module, "resolve_coverage", fake_resolve_coverage)
 
     # --- Build a synthetic catalog. ---
-    from plateau_parquet.catalog import CityCatalog, DatasetEntry
-    from plateau_parquet.schema import HazardKind
+    from plateau_bridge.catalog import CityCatalog, DatasetEntry
+    from plateau_bridge.schema import HazardKind
 
     catalog = CityCatalog(
         city_code="99999",

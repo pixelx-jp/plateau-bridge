@@ -145,7 +145,7 @@ async function probeOne(demo, city) {
 }
 
 async function main() {
-  console.log("plateau-parquet · browser smoke test");
+  console.log("plateau-bridge · browser smoke test");
   console.log(`testing ${DEMOS.length} demos × ${CITIES.length} cities = ${DEMOS.length * CITIES.length} probes`);
 
   // Pre-flight: confirm all servers are up

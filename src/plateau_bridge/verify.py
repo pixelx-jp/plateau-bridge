@@ -15,7 +15,7 @@ from pathlib import Path
 
 import duckdb
 
-from plateau_parquet.schema import DEPTH_HAZARDS, HazardKind, Manifest
+from plateau_bridge.schema import DEPTH_HAZARDS, HazardKind, Manifest
 
 
 @dataclass

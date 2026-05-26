@@ -14,9 +14,9 @@ from pathlib import Path
 
 import geopandas as gpd
 
-from plateau_parquet import __version__
-from plateau_parquet.catalog import CityCatalog
-from plateau_parquet.schema import (
+from plateau_bridge import __version__
+from plateau_bridge.catalog import CityCatalog
+from plateau_bridge.schema import (
     DEPTH_HAZARDS,
     CoverageConfidence,
     CoverageStats,

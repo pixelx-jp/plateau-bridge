@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pyarrow as pa
 
-from plateau_parquet.ops.style_table import encode_tile_uri, write_style_tables
+from plateau_bridge.ops.style_table import encode_tile_uri, write_style_tables
 
 
 def test_encode_tile_uri_is_url_safe() -> None:

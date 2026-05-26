@@ -2,7 +2,7 @@
 
 PLATEAU hazard datasets often carry ``declared_full_admin: true`` — the source
 says "covers the entire administrative area" — without shipping the admin
-polygon. ``plateau-parquet`` ships its own polygons for the bundled cities so
+polygon. ``plateau-bridge`` ships its own polygons for the bundled cities so
 the ``declared_full_admin`` fallback in ``sources.coverage`` has data to work
 with out of the box. Users can override with ``plateau build --admin <path>``.
 
@@ -68,7 +68,7 @@ ADMIN_PROVENANCE = (
 @lru_cache(maxsize=1)
 def _bundled_admin() -> gpd.GeoDataFrame:
     """Load and cache the bundled admin-polygon GeoDataFrame."""
-    with (files("plateau_parquet") / "data" / "japan_admin.geojson").open(
+    with (files("plateau_bridge") / "data" / "japan_admin.geojson").open(
         encoding="utf-8"
     ) as f:
         gdf = gpd.read_file(f)

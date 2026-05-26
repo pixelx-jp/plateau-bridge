@@ -1,6 +1,6 @@
 """Generate the Building Age Rainbow poster from a buildings.parquet.
 
-This is plateau-parquet's headline visual: every building in a city, coloured by
+This is plateau-bridge's headline visual: every building in a city, coloured by
 construction decade. The poster is the README screenshot — the thing that
 makes someone click ⭐.
 
@@ -22,7 +22,7 @@ from matplotlib import font_manager
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 from matplotlib.patches import Patch
 
-from plateau_parquet.attribution import png_corner_text
+from plateau_bridge.attribution import png_corner_text
 
 # Candidate CJK fonts in install-priority order. matplotlib's bundled DejaVu
 # can't render kanji, so we try to detect a system Japanese font; if none is

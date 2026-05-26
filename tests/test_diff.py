@@ -8,7 +8,7 @@ import geopandas as gpd
 import numpy as np
 from shapely.geometry import Polygon
 
-from plateau_parquet.diff import diff
+from plateau_bridge.diff import diff
 
 
 def _p(x: float, y: float, size: float = 0.001) -> Polygon:

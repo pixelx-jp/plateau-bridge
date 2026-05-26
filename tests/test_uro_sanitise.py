@@ -16,7 +16,7 @@ from __future__ import annotations
 from pathlib import Path
 from textwrap import dedent
 
-from plateau_parquet.sources.citygml import _maybe_sanitise_inputs, _sanitise_uro_duplicates
+from plateau_bridge.sources.citygml import _maybe_sanitise_inputs, _sanitise_uro_duplicates
 
 CLEAN_GML = dedent("""\
     <?xml version="1.0" encoding="utf-8"?>

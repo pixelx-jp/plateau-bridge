@@ -23,11 +23,11 @@ body:
     id: env
     attributes:
       label: Environment
-      description: Python version, OS, plateau-parquet version, plateau-gis-converter version.
+      description: Python version, OS, plateau-bridge version, plateau-gis-converter version.
       placeholder: |
         - python: 3.12.3
         - os: macOS 15.0
-        - plateau-parquet: 0.1.0
+        - plateau-bridge: 0.1.0
         - converter: 0.5.1
     validations:
       required: true

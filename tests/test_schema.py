@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from plateau_parquet.schema import (
+from plateau_bridge.schema import (
     BUILDINGS_ARROW_SCHEMA,
     DEPTH_HAZARDS,
     HazardKind,

@@ -208,7 +208,7 @@ class Manifest(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
 
     attribution: str = ATTRIBUTION
-    tool: str = "plateau-parquet"
+    tool: str = "plateau-bridge"
     tool_version: str
     generated_at: datetime
     city_code: str

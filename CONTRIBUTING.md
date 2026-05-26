@@ -1,9 +1,9 @@
 # Contributing
 
-Thanks for taking the time. plateau-parquet is small enough that you can read the
+Thanks for taking the time. plateau-bridge is small enough that you can read the
 whole codebase in an afternoon — please do, then pick from below.
 
-plateau-parquet is built and maintained by **[Yodo Labs](https://yodolabs.jp)**
+plateau-bridge is built and maintained by **[Yodo Labs](https://yodolabs.jp)**
 (PixelX Inc.). For non-trivial work — anything that touches gate orchestration,
 the data contract, or the catalog registry — open an issue first so we can
 align on direction before you spend the time.
@@ -12,7 +12,7 @@ align on direction before you spend the time.
 
 ### 1. Add a city to the catalog
 
-`src/plateau_parquet/catalog_registry.json` is the registry. Add an entry, run
+`src/plateau_bridge/catalog_registry.json` is the registry. Add an entry, run
 
 ```bash
 plateau build <code> --gates A --skip-3dtiles --no-hazards
@@ -27,7 +27,7 @@ We accept any city with a published PLATEAU bldg dataset.
 The biggest gap in our honest-hazard story is that all 61 catalog
 hazard entries resolve to `declared_full_admin` instead of the more
 precise `explicit_polygon`. The infrastructure to upgrade them is
-already in tree (`src/plateau_parquet/sources/coverage_ksj.py`); what's
+already in tree (`src/plateau_bridge/sources/coverage_ksj.py`); what's
 missing is the **mapping table** from PLATEAU source-document names
 to MLIT KSJ download URLs.
 
@@ -44,7 +44,7 @@ code change. Each row takes ~5–10 min:
 3. Look up the matching KSJ URL on
    [nlftp.mlit.go.jp/ksj/](https://nlftp.mlit.go.jp/ksj/) (A31 for
    river flood, A40 tsunami, A48 landslide, A41 storm surge).
-4. PR an entry to `src/plateau_parquet/data/coverage_sources.json`:
+4. PR an entry to `src/plateau_bridge/data/coverage_sources.json`:
 
 ```jsonc
 {

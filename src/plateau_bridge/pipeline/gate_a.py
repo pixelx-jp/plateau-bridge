@@ -19,18 +19,18 @@ from pathlib import Path
 
 import geopandas as gpd
 
-from plateau_parquet.admin import ADMIN_PROVENANCE, load_admin
-from plateau_parquet.catalog import CityCatalog
-from plateau_parquet.config import load_settings
-from plateau_parquet.manifest import build_manifest, write_manifest
-from plateau_parquet.ops.attributes import field_coverage, normalise
-from plateau_parquet.ops.intersect import apply_coverage, apply_hazards
-from plateau_parquet.ops.uid import batch_uids
-from plateau_parquet.schema import ATTRIBUTION
-from plateau_parquet.sources.citygml import convert_buildings, load_geojson
-from plateau_parquet.sources.coverage import resolve_coverage
-from plateau_parquet.sources.download import fetch_and_unzip
-from plateau_parquet.sources.hazard import load_hazard
+from plateau_bridge.admin import ADMIN_PROVENANCE, load_admin
+from plateau_bridge.catalog import CityCatalog
+from plateau_bridge.config import load_settings
+from plateau_bridge.manifest import build_manifest, write_manifest
+from plateau_bridge.ops.attributes import field_coverage, normalise
+from plateau_bridge.ops.intersect import apply_coverage, apply_hazards
+from plateau_bridge.ops.uid import batch_uids
+from plateau_bridge.schema import ATTRIBUTION
+from plateau_bridge.sources.citygml import convert_buildings, load_geojson
+from plateau_bridge.sources.coverage import resolve_coverage
+from plateau_bridge.sources.download import fetch_and_unzip
+from plateau_bridge.sources.hazard import load_hazard
 
 log = logging.getLogger(__name__)
 

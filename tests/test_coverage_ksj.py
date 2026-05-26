@@ -19,9 +19,9 @@ from pathlib import Path
 from textwrap import dedent
 from unittest.mock import patch
 
-from plateau_parquet.catalog import DatasetEntry
-from plateau_parquet.schema import HazardKind
-from plateau_parquet.sources.coverage_ksj import (
+from plateau_bridge.catalog import DatasetEntry
+from plateau_bridge.schema import HazardKind
+from plateau_bridge.sources.coverage_ksj import (
     KsjMapping,
     load_coverage_sources,
     resolve_explicit_polygon_from_metadata,
@@ -80,7 +80,7 @@ def test_resolve_returns_none_when_table_empty(tmp_path: Path) -> None:
     (meta / "udx_13115_city_2024_fld_op.xml").write_text(METADATA_XML, encoding="utf-8")
 
     with patch(
-        "plateau_parquet.sources.coverage_ksj.load_coverage_sources",
+        "plateau_bridge.sources.coverage_ksj.load_coverage_sources",
         return_value={},
     ):
         result = resolve_explicit_polygon_from_metadata(
@@ -107,7 +107,7 @@ def test_resolve_returns_none_when_no_mapping_matches(tmp_path: Path) -> None:
         ),
     }
     with patch(
-        "plateau_parquet.sources.coverage_ksj.load_coverage_sources",
+        "plateau_bridge.sources.coverage_ksj.load_coverage_sources",
         return_value=mapping,
     ):
         result = resolve_explicit_polygon_from_metadata(
@@ -135,7 +135,7 @@ def test_resolve_skips_wrong_hazard_kind(tmp_path: Path) -> None:
         ),
     }
     with patch(
-        "plateau_parquet.sources.coverage_ksj.load_coverage_sources",
+        "plateau_bridge.sources.coverage_ksj.load_coverage_sources",
         return_value=mapping,
     ):
         result = resolve_explicit_polygon_from_metadata(
@@ -159,8 +159,8 @@ def test_resolver_falls_back_when_ksj_insufficient_vs_hazard(tmp_path: Path) -> 
     import geopandas as gpd
     from shapely.geometry import box
 
-    from plateau_parquet.schema import CoverageConfidence
-    from plateau_parquet.sources.coverage import resolve_coverage
+    from plateau_bridge.schema import CoverageConfidence
+    from plateau_bridge.sources.coverage import resolve_coverage
 
     entry = DatasetEntry(
         dataset_id="t-fld",
@@ -176,10 +176,10 @@ def test_resolver_falls_back_when_ksj_insufficient_vs_hazard(tmp_path: Path) -> 
     hazard = gpd.GeoDataFrame({"geometry": [box(0, 0, 8, 10)]}, crs=4326)
     sliver = gpd.GeoDataFrame({"geometry": [box(0, 0, 2, 10)]}, crs=4326)
 
-    from plateau_parquet.sources.coverage_ksj import _ExplicitPolygonResult
+    from plateau_bridge.sources.coverage_ksj import _ExplicitPolygonResult
     fake_result = _ExplicitPolygonResult(polygon=sliver, source_documents=("test",))
     with patch(
-        "plateau_parquet.sources.coverage_ksj.resolve_explicit_polygon_from_metadata",
+        "plateau_bridge.sources.coverage_ksj.resolve_explicit_polygon_from_metadata",
         return_value=fake_result,
     ):
         ext = resolve_coverage(
@@ -201,8 +201,8 @@ def test_resolver_falls_back_to_declared_when_no_hazard_polygons(tmp_path: Path)
     import geopandas as gpd
     from shapely.geometry import box
 
-    from plateau_parquet.schema import CoverageConfidence
-    from plateau_parquet.sources.coverage import resolve_coverage
+    from plateau_bridge.schema import CoverageConfidence
+    from plateau_bridge.sources.coverage import resolve_coverage
 
     entry = DatasetEntry(
         dataset_id="t-fld",
@@ -215,7 +215,7 @@ def test_resolver_falls_back_to_declared_when_no_hazard_polygons(tmp_path: Path)
     admin = gpd.GeoDataFrame({"geometry": [box(0, 0, 10, 10)]}, crs=4326)
 
     with patch(
-        "plateau_parquet.sources.coverage_ksj.resolve_explicit_polygon_from_metadata",
+        "plateau_bridge.sources.coverage_ksj.resolve_explicit_polygon_from_metadata",
         return_value=None,
     ):
         ext = resolve_coverage(
@@ -232,8 +232,8 @@ def test_resolver_uses_inundation_bounded_when_no_ksj_match(tmp_path: Path) -> N
     import geopandas as gpd
     from shapely.geometry import box
 
-    from plateau_parquet.schema import CoverageConfidence
-    from plateau_parquet.sources.coverage import resolve_coverage
+    from plateau_bridge.schema import CoverageConfidence
+    from plateau_bridge.sources.coverage import resolve_coverage
 
     entry = DatasetEntry(
         dataset_id="t-fld",
@@ -247,7 +247,7 @@ def test_resolver_uses_inundation_bounded_when_no_ksj_match(tmp_path: Path) -> N
     hazard = gpd.GeoDataFrame({"geometry": [box(2, 2, 5, 5)]}, crs=4326)
 
     with patch(
-        "plateau_parquet.sources.coverage_ksj.resolve_explicit_polygon_from_metadata",
+        "plateau_bridge.sources.coverage_ksj.resolve_explicit_polygon_from_metadata",
         return_value=None,
     ):
         ext = resolve_coverage(
@@ -266,8 +266,8 @@ def test_resolver_accepts_ksj_when_it_dominates_hazard(tmp_path: Path) -> None:
     import geopandas as gpd
     from shapely.geometry import box
 
-    from plateau_parquet.schema import CoverageConfidence
-    from plateau_parquet.sources.coverage import resolve_coverage
+    from plateau_bridge.schema import CoverageConfidence
+    from plateau_bridge.sources.coverage import resolve_coverage
 
     entry = DatasetEntry(
         dataset_id="t-fld",
@@ -282,10 +282,10 @@ def test_resolver_accepts_ksj_when_it_dominates_hazard(tmp_path: Path) -> None:
     # KSJ extent fully contains the hazard polygon.
     extent = gpd.GeoDataFrame({"geometry": [box(0, 0, 8, 8)]}, crs=4326)
 
-    from plateau_parquet.sources.coverage_ksj import _ExplicitPolygonResult
+    from plateau_bridge.sources.coverage_ksj import _ExplicitPolygonResult
     fake_result = _ExplicitPolygonResult(polygon=extent, source_documents=("test",))
     with patch(
-        "plateau_parquet.sources.coverage_ksj.resolve_explicit_polygon_from_metadata",
+        "plateau_bridge.sources.coverage_ksj.resolve_explicit_polygon_from_metadata",
         return_value=fake_result,
     ):
         ext = resolve_coverage(
@@ -311,7 +311,7 @@ def test_schema_loader_handles_malformed_hazard(tmp_path: Path) -> None:
     bundled.write_text(json.dumps(bad), encoding="utf-8")
 
     with patch(
-        "plateau_parquet.sources.coverage_ksj.files",
+        "plateau_bridge.sources.coverage_ksj.files",
     ) as mock_files:
         # importlib.resources.files-style chain
         class _Loc:

@@ -49,7 +49,7 @@ floor.
 `centroid_mode=False` is available for edge-precise legacy behaviour:
 
 ```python
-from plateau_parquet.ops.intersect import apply_hazards
+from plateau_bridge.ops.intersect import apply_hazards
 apply_hazards(gdf, layers, centroid_mode=False)   # legacy
 ```
 

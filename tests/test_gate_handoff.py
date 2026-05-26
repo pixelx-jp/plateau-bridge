@@ -16,7 +16,7 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import Polygon
 
-from plateau_parquet.pipeline.gate_b import GateBResult
+from plateau_bridge.pipeline.gate_b import GateBResult
 
 
 def test_gate_b_result_carries_enriched_gdf() -> None:

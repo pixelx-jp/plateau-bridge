@@ -18,7 +18,7 @@ import json
 import logging
 from pathlib import Path
 
-from plateau_parquet.schema import ATTRIBUTION
+from plateau_bridge.schema import ATTRIBUTION
 
 log = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ def stamp_tileset_json(
     if manifest is not None:
         # Embed a minimal pointer rather than the whole manifest — glb consumers
         # don't need our full coverage stats inline.
-        extras["plateau_parquet"] = {
+        extras["plateau_bridge"] = {
             "tool_version": manifest.get("tool_version"),
             "datasets": manifest.get("datasets", []),
             "city_code": manifest.get("city_code"),

@@ -1,6 +1,6 @@
 # Honesty invariants
 
-This is the philosophical core of plateau-parquet. Everything else can change —
+This is the philosophical core of plateau-bridge. Everything else can change —
 file formats, CLI flags, rendering stacks — and the project survives. The
 invariants below cannot break without making the data dishonest.
 
@@ -118,7 +118,7 @@ Every `buildings.parquet` ships with a `manifest.json` carrying:
 - `coverage_confidence_breakdown` per hazard
 - A free-text `notes` array with the actual clipping ratio (e.g. "clipped
   from 90,299 → 41,858 buildings")
-- The `plateau-parquet` version
+- The `plateau-bridge` version
 
 `plateau verify` cross-checks the manifest against the parquet — every
 hazard `*_coverage_source_ids` value referenced in the data must exist in

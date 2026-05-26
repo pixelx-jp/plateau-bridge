@@ -3,7 +3,7 @@ requires = ["hatchling>=1.21"]
 build-backend = "hatchling.build"
 
 [project]
-name = "plateau-parquet"
+name = "plateau-bridge"
 version = "0.1.0"
 description = "A trustworthy building index + hazard intersection pipeline for Project PLATEAU."
 readme = "README.md"
@@ -41,19 +41,19 @@ all = ["pmtiles>=3.2", "pygltflib>=1.16", "matplotlib>=3.8"]
 dev = ["pytest>=8", "pytest-cov", "ruff>=0.4", "mypy>=1.10"]
 
 [project.scripts]
-plateau = "plateau_parquet.cli:app"
+plateau = "plateau_bridge.cli:app"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/plateau_parquet"]
+packages = ["src/plateau_bridge"]
 
 [tool.hatch.build.targets.wheel.force-include]
-"src/plateau_parquet/catalog_registry.json" = "plateau_parquet/catalog_registry.json"
-"src/plateau_parquet/data/japan_admin.geojson" = "plateau_parquet/data/japan_admin.geojson"
+"src/plateau_bridge/catalog_registry.json" = "plateau_bridge/catalog_registry.json"
+"src/plateau_bridge/data/japan_admin.geojson" = "plateau_bridge/data/japan_admin.geojson"
 
 [project.urls]
-Homepage = "https://github.com/pixelx-jp/plateau-parquet"
-Documentation = "https://github.com/pixelx-jp/plateau-parquet#readme"
-Issues = "https://github.com/pixelx-jp/plateau-parquet/issues"
+Homepage = "https://github.com/pixelx-jp/plateau-bridge"
+Documentation = "https://github.com/pixelx-jp/plateau-bridge#readme"
+Issues = "https://github.com/pixelx-jp/plateau-bridge/issues"
 Organization = "https://yodolabs.jp"
 
 [tool.ruff]

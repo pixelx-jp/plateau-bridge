@@ -137,7 +137,7 @@ def _build_synthetic_glb(path: Path) -> None:
 
 
 def test_per_feature_height_matches_y_bbox(tmp_path: Path) -> None:
-    from plateau_parquet.ops.geometric_height import compute_glb_heights
+    from plateau_bridge.ops.geometric_height import compute_glb_heights
 
     glb = tmp_path / "synth.glb"
     _build_synthetic_glb(glb)
@@ -154,7 +154,7 @@ def test_interleaved_stride_is_honoured(tmp_path: Path) -> None:
     like PLATEAU's; if the reader regresses to packed reads, neither
     expected height appears in the output.
     """
-    from plateau_parquet.ops.geometric_height import compute_glb_heights
+    from plateau_bridge.ops.geometric_height import compute_glb_heights
 
     glb = tmp_path / "synth.glb"
     _build_synthetic_glb(glb)

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from plateau_parquet.sources.download import _url_key, cache_path_for_url
+from plateau_bridge.sources.download import _url_key, cache_path_for_url
 
 
 def test_cache_path_matches_extraction_target(tmp_path: Path) -> None:

@@ -1,5 +1,5 @@
 {
-  "name": "plateau-parquet-workspace",
+  "name": "plateau-bridge-workspace",
   "private": true,
   "description": "Repo-root workspace — owns dev tooling (playwright smoke tests) that span the three browser demos under examples/.",
   "scripts": {
