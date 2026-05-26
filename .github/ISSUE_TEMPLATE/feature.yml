@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest a new capability
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Concrete user story, not abstract.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: |
+        Sketch the API or output. Be specific. PRs welcome — point at the file
+        where you think the change belongs.
+  - type: dropdown
+    id: gate
+    attributes:
+      label: Which gate would this touch?
+      options:
+        - Gate A (parquet / hazard / coverage)
+        - Gate B (3D Tiles + style tables)
+        - Gate C (PMTiles / FGB / zoning)
+        - CLI / DX
+        - Docs / examples
+        - Other

@@ -1,0 +1,12 @@
+{
+  "name": "plateau-parquet-workspace",
+  "private": true,
+  "description": "Repo-root workspace — owns dev tooling (playwright smoke tests) that span the three browser demos under examples/.",
+  "scripts": {
+    "test:browser": "node scripts/test_browser.mjs",
+    "test:browser:shibuya": "node scripts/test_browser.mjs --city=shibuya"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  }
+}

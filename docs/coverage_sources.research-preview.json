@@ -1,0 +1,328 @@
+{
+  "_schema_doc": "Map PLATEAU bundle source-document strings → MLIT KSJ explicit-polygon URLs. See docs/COVERAGE_ROADMAP.md for full rationale.",
+  "_key": "Canonical source-document name as it appears in PLATEAU bundle metadata XML (under <descriptiveKeywords type=005>). Strip trailing (date) publisher tail with sources.metadata_xml.canonicalise_source_document() before lookup.",
+  "_value_shape": {
+    "hazard": "river_flood | tsunami | landslide | storm_surge | inland_flood",
+    "ksj_urls": "List of MLIT KSJ download URLs (zip of Shapefile or GML). Resolver unions polygons across all URLs. One URL is fine; multiple is for sources that span multiple regional / prefectural KSJ files.",
+    "published": "ISO-8601 date the underlying 想定区域 was published.",
+    "notes": "(optional) free-text — e.g. 'national-managed; under Kanto regional bureau A31-21_83'."
+  },
+  "_ksj_file_naming": "A31 (river flood) files are organised by regional bureau OR prefecture. 81=Hokkaido, 82=Tohoku, 83=Kanto, 84=Hokuriku, 85=Chubu, 86=Kinki, 87=Chugoku, 88=Shikoku, 89=Kyushu (national-managed rivers). 01-47 = JIS prefecture codes (prefecture-managed rivers). A given PLATEAU source-document may span both — list both URLs.",
+  "_status": "Tokyo + Osaka + Yokohama prefectural KSJ A31 mapped 2026-05-26. National-managed rivers (under regional bureaus 83 Kanto, 86 Kinki, etc.) are SKIPPED for now — those KSJ files only ship KSJ-schema GML which gdal/pyogrio can't read without a custom KSJ reader. Honest position: those source-documents resolve to `unknown` until a KSJ-GML reader is added or MLIT ships SHP for the regional files. See docs/COVERAGE_ROADMAP.md.",
+  "entries": {
+    "荒川水系神田川、善福寺川、妙正寺川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "mixed national + Tokyo prefecture"
+    },
+    "荒川水系石神井川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo prefecture"
+    },
+    "荒川水系白子川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo prefecture"
+    },
+    "古川水系渋谷川・古川、目黒川水系目黒川、呑川水系呑川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo prefecture"
+    },
+    "多摩川水系野川、仙川、入間川、谷沢川、丸子川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo prefecture"
+    },
+    "境川水系境川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip",
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo-Kanagawa border"
+    },
+    "神田川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2014-04-30",
+      "notes": "Tokyo Metro 建設局河川部"
+    },
+    "隅田川及び新河岸川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro"
+    },
+    "石神井川及び白子川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro"
+    },
+    "城南地区河川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro"
+    },
+    "江東内部河川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro"
+    },
+    "野川、仙川、入間川、谷沢川及び丸子川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro"
+    },
+    "黒目川、落合川、柳瀬川、空堀川及び奈良橋川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro"
+    },
+    "残堀川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro"
+    },
+    "境川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip",
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro; Tokyo-Kanagawa"
+    },
+    "中川・綾瀬川圏域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro"
+    },
+    "鶴見川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro / Kanto"
+    },
+    "浅川圏域、大栗川及び三沢川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro"
+    },
+    "霞川及び多摩川上流圏域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro"
+    },
+    "秋川及び平井川流域浸水予想区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_13_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Tokyo Metro"
+    },
+    "淀川水系旧淀川[大川・堂島川・安治JII]、土佐堀川、木津川、尻無川、正蓮寺川、六軒家川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_27_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Osaka prefecture"
+    },
+    "大和川水系石川、飛鳥川、大乗川、梅川、太井川、千早川、佐備川、天見川、水越川、宇名田川、石見川、加賀田川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_27_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Osaka prefecture"
+    },
+    "淀川水系安威川、正雀川、正雀川分水路、山田川、大正川、境川、新大正川、三条川、茨木川、佐保川、勝尾寺川、箕川、郷之久保川、川合裏川、裏川、土室川分水路洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_27_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Osaka prefecture"
+    },
+    "淀川水系神崎川・中島川・左門殿川・西島川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_27_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Osaka prefecture"
+    },
+    "淀川水系天竺川・兎川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_27_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Osaka prefecture"
+    },
+    "淀川水系高川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_27_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Osaka prefecture"
+    },
+    "大和川水系東除川・落堀川・平尾小川・大水川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_27_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Osaka prefecture"
+    },
+    "大和川水系西除川": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_27_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Osaka prefecture; truncated source name in PLATEAU metadata"
+    },
+    "寝屋川水系寝屋川、第二寝屋川、恩智川、平野川、平野川分水路、古川、楠根川、城北川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_27_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Osaka prefecture"
+    },
+    "鶴見川水系砂田川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Kanagawa prefecture"
+    },
+    "鶴見川水系大熊川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Kanagawa prefecture"
+    },
+    "鶴見川水系鴨居川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Kanagawa prefecture"
+    },
+    "鶴見川水系恩田川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Kanagawa prefecture"
+    },
+    "鶴見川水系梅田川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Kanagawa prefecture"
+    },
+    "帷子川水系洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Kanagawa prefecture"
+    },
+    "大岡川水系洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Kanagawa prefecture"
+    },
+    "宮川水系宮川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Kanagawa prefecture"
+    },
+    "侍従川水系侍従川洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Kanagawa prefecture"
+    },
+    "境川水系洪水浸水想定区域図": {
+      "hazard": "river_flood",
+      "ksj_urls": [
+        "https://nlftp.mlit.go.jp/ksj/gml/data/A31/A31-21/A31-21_14_GML.zip"
+      ],
+      "published": "2018-03-30",
+      "notes": "Kanagawa prefecture"
+    }
+  }
+}

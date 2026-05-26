@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>plateau-parquet · deck.gl Tile3DLayer demo</title>
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; background: #0c0e12; color: #e7e9ee; font-family: -apple-system, system-ui, sans-serif; }
+      #app { width: 100vw; height: 100vh; position: relative; }
+      #legend { position: fixed; top: 12px; left: 12px; padding: 12px 16px; background: rgba(20,22,28,0.85); border-radius: 8px; font-size: 13px; line-height: 1.5; z-index: 10; pointer-events: none; max-width: 360px; }
+      #legend small { display:block; margin-top:8px; color:#9ca3af; line-height: 1.45; font-size: 11px; }
+      #legend a { color: #93c5fd; pointer-events: auto; }
+      #attr { position: fixed; bottom: 8px; right: 12px; font-size: 11px; opacity: 0.6; z-index: 10; pointer-events: none; }
+      .swatch { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="legend">
+      <strong>deck.gl · Tile3DLayer</strong>
+      <small>
+        loaders.gl 4.x crashes on PLATEAU's variable-length
+        <code>gml_id</code> property table
+        (<code>Not implemented - arrayOffsets for strings</code>),
+        which would block <em>every</em> tile from loading. A surgical
+        one-line patch (<code>loaders-gl-patch.mjs</code>, run on
+        <code>npm install</code>) makes that unsupported case return
+        an empty array instead of throwing — numeric EXT_structural_metadata
+        columns (<code>measuredHeight</code>, etc.) load normally.<br/><br/>
+        Sister demos: three.js
+        (<a href="http://localhost:5173">:5173</a>) — full per-vertex
+        altitude shading; Cesium
+        (<a href="http://localhost:5174">:5174</a>) — <code>Cesium3DTileStyle</code>
+        height expressions.
+      </small>
+    </div>
+    <div id="attr">© Project PLATEAU / MLIT (CC BY 4.0) · powered by plateau-parquet</div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

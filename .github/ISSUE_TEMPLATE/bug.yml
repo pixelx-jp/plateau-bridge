@@ -1,0 +1,38 @@
+name: Bug report
+description: Something produced wrong data or crashed
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, what actually happened, and how to reproduce.
+      placeholder: |
+        `plateau build --city 13113` produced a parquet where ...
+    validations:
+      required: true
+  - type: textarea
+    id: manifest
+    attributes:
+      label: manifest.json
+      description: |
+        Paste the `manifest.json` from your build (or its tail if huge).
+        This tells us which datasets you used and what coverage stats looked like.
+      render: json
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: Python version, OS, plateau-parquet version, plateau-gis-converter version.
+      placeholder: |
+        - python: 3.12.3
+        - os: macOS 15.0
+        - plateau-parquet: 0.1.0
+        - converter: 0.5.1
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Relevant log output
+      render: shell

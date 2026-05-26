@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# `plateau build` outputs — per-city dirs at the repo root,
+# multi-GB each, never checked in.
+out/
+out_*/
+_work/
+
+# `plateau cache push` artifacts — bundles live on GitHub Releases, not in git.
+# We keep `distribution/index.json` tracked (~500 B, maps city → release URL).
+distribution/*.tar.zst
+distribution/*.tar.zst.sha256
+
+# Node — pulled fresh by `pnpm install` in each examples/browser_* dir
+# and by `npm install` for repo-root playwright dev-deps.
+node_modules/
+package-lock.json
+
+# Vite build / dev caches
+**/dist/
+**/.vite/
+
+# pnpm "approve builds" prompt stubs — regenerated per machine, not portable.
+pnpm-workspace.yaml
+**/pnpm-workspace.yaml
+
+# Editors / OS / IDE
+.vscode/
+.idea/
+.cursor/
+.aider*
+.claude/
+.DS_Store
+*.swp
+*~
+
+# Local environment files — never commit, always provision per-deploy.
+.env
+.env.local
+.env.*.local
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# Local dev notes — not part of the public docs surface.
+HANDOFF.md
+
+# Local plateau-core caches (the canonical one is ~/Library/Caches/plateau-core
+# on macOS — see docs/DATA.md — but ignore stray dirs here too).
+.plateau-cache/
+
+# Python virtualenvs
+.venv/
+venv/
+env/

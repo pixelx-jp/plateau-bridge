@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>plateau-parquet · Cesium 3D Tiles demo</title>
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; background: #0c0e12; color: #e7e9ee; font-family: -apple-system, system-ui, sans-serif; }
+      #app { width: 100vw; height: 100vh; position: relative; }
+      .cesium-viewer-bottom { display: none; }   /* hide Cesium credits row */
+      #legend { position: fixed; top: 12px; left: 12px; padding: 12px 16px; background: rgba(20,22,28,0.85); border-radius: 8px; font-size: 13px; line-height: 1.5; z-index: 10; }
+      .swatch { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
+      #attr { position: fixed; bottom: 8px; right: 12px; font-size: 11px; opacity: 0.6; z-index: 10; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="legend">
+      <strong>Cesium · 3D Tiles 1.1</strong> · tiles: <span id="counter">0</span><br/>
+      <span class="swatch" style="background:#0d0887"></span>height 0&nbsp;m<br/>
+      <span class="swatch" style="background:#9c179e"></span>15&nbsp;m<br/>
+      <span class="swatch" style="background:#ed6886"></span>30&nbsp;m<br/>
+      <span class="swatch" style="background:#fdc527"></span>45&nbsp;m<br/>
+      <span class="swatch" style="background:#f0f921"></span>60+&nbsp;m
+    </div>
+    <div id="attr">© Project PLATEAU / MLIT (CC BY 4.0) · powered by plateau-parquet</div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: "plateau-parquet: a trustworthy building index and hazard intersection pipeline for Project PLATEAU"
+message: "If you use this software, please cite it."
+type: software
+authors:
+  - name: "plateau-parquet contributors"
+repository-code: "https://github.com/pixelx-jp/plateau-parquet"
+license: MIT
+version: 0.1.0
+date-released: 2026-05-23
+keywords:
+  - PLATEAU
+  - CityGML
+  - geospatial
+  - 3D city models
+  - hazard analysis
+  - Japan
+references:
+  - type: data
+    title: "Project PLATEAU"
+    authors:
+      - name: "Ministry of Land, Infrastructure, Transport and Tourism (MLIT)"
+    url: "https://www.mlit.go.jp/plateau/"
+    license: "CC-BY-4.0"

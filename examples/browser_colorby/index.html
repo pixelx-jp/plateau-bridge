@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>plateau-parquet · colorBy demo</title>
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; background: #0c0e12; color: #e7e9ee; font-family: -apple-system, system-ui, sans-serif; }
+      #app { width: 100%; height: 100%; }
+      #legend { position: fixed; top: 12px; left: 12px; padding: 12px 16px; background: rgba(20,22,28,0.85); border-radius: 8px; font-size: 13px; line-height: 1.5; }
+      #legend h1 { margin: 0 0 6px 0; font-size: 14px; font-weight: 600; }
+      .swatch { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
+      #attr { position: fixed; bottom: 8px; right: 12px; font-size: 11px; opacity: 0.6; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="legend">
+      <h1>Color by: <code>altitude</code> (m above ground)</h1>
+      <div><span class="swatch" style="background:#0d0887"></span> 0</div>
+      <div><span class="swatch" style="background:#5402a3"></span> 15</div>
+      <div><span class="swatch" style="background:#9c179e"></span> 30</div>
+      <div><span class="swatch" style="background:#ed6886"></span> 50</div>
+      <div><span class="swatch" style="background:#fdc527"></span> 75</div>
+      <div><span class="swatch" style="background:#f0f921"></span> 100+</div>
+    </div>
+    <div id="info" style="position:fixed;top:12px;right:12px;padding:12px 28px 12px 16px;background:rgba(20,22,28,0.92);border-radius:8px;font-size:12px;line-height:1.6;max-width:340px;display:none;font-family:ui-monospace,monospace"></div>
+    <div id="controls" style="position:fixed;bottom:12px;left:12px;padding:10px 14px;background:rgba(20,22,28,0.85);border-radius:8px;font-size:12px;line-height:1.7;color:#e7e9ee">
+      <div><kbd style="background:#374151;padding:1px 6px;border-radius:3px;font-family:ui-monospace,monospace">drag</kbd> &nbsp;orbit</div>
+      <div><kbd style="background:#374151;padding:1px 6px;border-radius:3px;font-family:ui-monospace,monospace">⇧ drag</kbd> &nbsp;or <kbd style="background:#374151;padding:1px 6px;border-radius:3px;font-family:ui-monospace,monospace">right-drag</kbd> &nbsp;pan</div>
+      <div><kbd style="background:#374151;padding:1px 6px;border-radius:3px;font-family:ui-monospace,monospace">scroll</kbd> &nbsp;zoom</div>
+      <div><kbd style="background:#374151;padding:1px 6px;border-radius:3px;font-family:ui-monospace,monospace">click</kbd> &nbsp;inspect a building</div>
+    </div>
+    <div id="attr">© Project PLATEAU / MLIT (CC BY 4.0) · powered by plateau-parquet</div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

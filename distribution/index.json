@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "updated": "2026-05-24T05:08:10.841783+00:00",
+  "cities": [
+    {
+      "city_code": "13113",
+      "city_name": "",
+      "dataset_year": 2023,
+      "bundle_url": "file:///Users/xiuxi.pan/Desktop/PixelX/projects/yodo/projects/plateau/plateau-parquet/distribution/plateau-13113-2023-v1.tar.zst",
+      "sha256": "dbe43d4c1a6dd5092a671b2cc06c2a8f7f860f3f01285d973db2e06899005bde",
+      "bytes": 37709760,
+      "n_buildings": 41858,
+      "tool_version": "0.1.0"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+name: New city request / submission
+description: Add a city to the bundled catalog (or request one)
+labels: ["city", "good first issue"]
+body:
+  - type: input
+    id: city_code
+    attributes:
+      label: JIS city code
+      placeholder: "13113"
+    validations:
+      required: true
+  - type: input
+    id: city_name
+    attributes:
+      label: City name
+      placeholder: "Shibuya-ku"
+    validations:
+      required: true
+  - type: input
+    id: dataset_year
+    attributes:
+      label: Dataset year
+      placeholder: "2024"
+    validations:
+      required: true
+  - type: textarea
+    id: links
+    attributes:
+      label: Dataset URLs
+      description: |
+        Paste the PLATEAU Data Catalog URLs for: building (bldg), zoning (urf),
+        and each available hazard (fld / ifld / tnm / htd / lsfd).
+        For each hazard, note whether the source publishes an explicit
+        想定区域/調査範囲 polygon — if so, link it as well.
+    validations:
+      required: true
+  - type: checkboxes
+    id: ready
+    attributes:
+      label: Submission readiness
+      options:
+        - label: I am submitting a PR adding this entry to `catalog_registry.json`
+        - label: I have a build manifest.json to attach
+        - label: I am requesting this city be added (no PR yet)
