@@ -99,14 +99,33 @@ out_<slug>/
 ├── manifest.json           # provenance, coverage stats, sha256s
 ├── tile_index.json         # tile_content_uri → style file map
 ├── style/<encoded>.arrow   # per-tile attribute side table
-├── buildings/<ward>.fgb    # full-precision bbox export (per ward)
-└── 3dtiles/                # 3D Tiles 1.1 (visual geometry)
+└── buildings/<ward>.fgb    # full-precision bbox export (per ward)
 ```
 
-The 3dtiles directory is the bulk of the size (~80 % per city);
-without it, demos can't render but parquet / pmtiles queries work
-fine. Future work: optional bundle variants (`--lite` without 3dtiles)
-for users who only need analytical data.
+Bundle sizes are **40 MB – 300 MB compressed** per city. The full
+catalog (29 cities) totals ~3 GB.
+
+### Why no `3dtiles/` in the cache bundle?
+
+The visual 3D Tiles geometry for a single city is 1.8–18 GB on disk.
+Zstd compresses GLB poorly (binary already), so Yokohama's 18 GB
+would still exceed GitHub Releases' 2 GB per-file limit even after
+compression. Cache bundles ship the **analytics + 2D-map subset**;
+to view a city in the 3D browser demos, run the full build:
+
+```bash
+plateau build shibuya --prune-cache
+```
+
+`plateau build` produces the same parquet + pmtiles as `cache add`
+*plus* the 3D Tiles, locally on your machine. ~5–30 min depending on
+city size. See "Building from source" below.
+
+### Future work
+
+A separate per-city "tiles" bundle (split into < 2 GB chunks where
+needed) would let `cache add --with-tiles` deliver the full 3D
+experience. Open an issue if this matters for your use case.
 
 ## Versioning
 

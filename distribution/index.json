@@ -1,15 +1,295 @@
 {
   "schema": 1,
-  "updated": "2026-05-24T05:08:10.841783+00:00",
+  "updated": "2026-05-26T13:56:40.277050+00:00",
   "cities": [
     {
-      "city_code": "13113",
-      "city_name": "",
+      "city_code": "01100",
+      "city_name": "Sapporo-shi",
+      "dataset_year": 2020,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-01100-2020-v1.tar.zst",
+      "sha256": "8d25b88b1388957612251db4c61910b7c3b4ebbbda73fa278a9cab3a38ee4d9c",
+      "bytes": 600179273,
+      "n_buildings": 646431,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13101",
+      "city_name": "Chiyoda-ku",
       "dataset_year": 2023,
-      "bundle_url": "file:///Users/xiuxi.pan/Desktop/PixelX/projects/yodo/projects/plateau/plateau-parquet/distribution/plateau-13113-2023-v1.tar.zst",
-      "sha256": "dbe43d4c1a6dd5092a671b2cc06c2a8f7f860f3f01285d973db2e06899005bde",
-      "bytes": 37709760,
-      "n_buildings": 41858,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13101-2023-v1.tar.zst",
+      "sha256": "37241e43cd9191bedcfd83e11ade4d550eb1232d1f8defb52bf9fdf18f6c680b",
+      "bytes": 17555092,
+      "n_buildings": 12541,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13102",
+      "city_name": "Chuo-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13102-2023-v1.tar.zst",
+      "sha256": "a424c4e57d706d37d6b94a003f69b57d9fd12682d82d20098eafc94e83278698",
+      "bytes": 23289723,
+      "n_buildings": 16884,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13103",
+      "city_name": "Minato-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13103-2023-v1.tar.zst",
+      "sha256": "672cb6bd90b0fda2e690b3b47cce804bd0ea410b00d08b2f6c6fa2fd0e4fbe8f",
+      "bytes": 46794718,
+      "n_buildings": 32131,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13104",
+      "city_name": "Shinjuku-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13104-2023-v1.tar.zst",
+      "sha256": "30fcd311bb410cb9e6468fb6ff9baa4d6bf7706915fd579473fce1b86e31cd4e",
+      "bytes": 56181795,
+      "n_buildings": 57474,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13105",
+      "city_name": "Bunkyo-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13105-2023-v1.tar.zst",
+      "sha256": "6c644d240c95871eeb9ade28cee3ca81300cefaf5029cbff7939108825ec4f7f",
+      "bytes": 34629650,
+      "n_buildings": 39542,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13106",
+      "city_name": "Taito-ku",
+      "dataset_year": 2024,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13106-2024-v1.tar.zst",
+      "sha256": "546d87426fabd7e93055b01bcce1f7184c34a37f27fc3ef778ba51e0ebfb650f",
+      "bytes": 55263418,
+      "n_buildings": 41435,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13107",
+      "city_name": "Sumida-ku",
+      "dataset_year": 2024,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13107-2024-v1.tar.zst",
+      "sha256": "60e26e3a12b23fb044337c02f898ef8be5aae4335e0340470029618706a99ccf",
+      "bytes": 46169668,
+      "n_buildings": 52945,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13108",
+      "city_name": "Koto-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13108-2023-v1.tar.zst",
+      "sha256": "a36b786407899ad29e41058a7357b4174baded0d104af0a0fc8c1f74009c39c6",
+      "bytes": 58401118,
+      "n_buildings": 65401,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13109",
+      "city_name": "Shinagawa-ku",
+      "dataset_year": 2024,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13109-2024-v1.tar.zst",
+      "sha256": "24f66c9d83d1ffad85169a18942f82d1e2cae4dc463b8793e5c82f5a2ae5510b",
+      "bytes": 60743636,
+      "n_buildings": 68126,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13110",
+      "city_name": "Meguro-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13110-2023-v1.tar.zst",
+      "sha256": "be7226728d5acaa572f0059a678bb8d0c04e3562d23c86708221454fd986f548",
+      "bytes": 49477217,
+      "n_buildings": 55365,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13111",
+      "city_name": "Ota-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13111-2023-v1.tar.zst",
+      "sha256": "7a4d46e9ae1394d1dc1fb3857df94a05f4aa572730bd566082482c9bfca4979f",
+      "bytes": 137560180,
+      "n_buildings": 156650,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13112",
+      "city_name": "Setagaya-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13112-2023-v1.tar.zst",
+      "sha256": "3397aea503e01a2e8c2f8efc7c6267ef688b10d9e78f71d99ec878b113953040",
+      "bytes": 185198958,
+      "n_buildings": 204691,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13113",
+      "city_name": "Shibuya-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13113-2023-v1.tar.zst",
+      "sha256": "edf7f322d4a4fa7980880899d9a21f38f988fd54ed77cf469ce41b776c7030ee",
+      "bytes": 42731104,
+      "n_buildings": 41829,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13114",
+      "city_name": "Nakano-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13114-2023-v1.tar.zst",
+      "sha256": "bf46cb184ddbba9395234a76960e33fef6939d1d4548046e92b30f79da121244",
+      "bytes": 65087902,
+      "n_buildings": 73015,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13115",
+      "city_name": "Suginami-ku",
+      "dataset_year": 2024,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13115-2024-v1.tar.zst",
+      "sha256": "9239f426360cb3643bd82f2bdae05b1d64cebb60a5101624bf1945aa0ee90c7c",
+      "bytes": 128037259,
+      "n_buildings": 143453,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13116",
+      "city_name": "Toshima-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13116-2023-v1.tar.zst",
+      "sha256": "252839dbe7d509a7859ddc3ec07d4b12f2ef0deb699533f474a57d230af780fb",
+      "bytes": 53595574,
+      "n_buildings": 57788,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13117",
+      "city_name": "Kita-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13117-2023-v1.tar.zst",
+      "sha256": "a55f990ddd084dfb820df6d839a471b6c95dc6c5e8e89f826473006571fe29c5",
+      "bytes": 64248681,
+      "n_buildings": 73316,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13118",
+      "city_name": "Arakawa-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13118-2023-v1.tar.zst",
+      "sha256": "5a44113303aaf7342520ea0dd25b94681c6f444900adc969e17c49756f4c1ff4",
+      "bytes": 36624126,
+      "n_buildings": 44403,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13119",
+      "city_name": "Itabashi-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13119-2023-v1.tar.zst",
+      "sha256": "b03d12a43c7cbc3fc67cbf1e056b3cf91e8e75d516700111016694d7b48aa03f",
+      "bytes": 96436983,
+      "n_buildings": 106769,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13120",
+      "city_name": "Nerima-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13120-2023-v1.tar.zst",
+      "sha256": "70731d03e62dc70a5a5aaed25eeb4a6d8c73cab56c040d1068d5c20e67db1f25",
+      "bytes": 157480116,
+      "n_buildings": 176987,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13121",
+      "city_name": "Adachi-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13121-2023-v1.tar.zst",
+      "sha256": "0ad089a7aaec970d42b1af930b58f9abd13a432e01a6818058a0611aa048acf6",
+      "bytes": 148792438,
+      "n_buildings": 167100,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13122",
+      "city_name": "Katsushika-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13122-2023-v1.tar.zst",
+      "sha256": "a2bfb467114b2e968d150e688e8ee262b3d05757a5529482992419c477dafbef",
+      "bytes": 110446931,
+      "n_buildings": 118543,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "13123",
+      "city_name": "Edogawa-ku",
+      "dataset_year": 2023,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-13123-2023-v1.tar.zst",
+      "sha256": "080eb863b131fba1af24a64abfeaa9e70ded9f7c29aecf9505980932413575f5",
+      "bytes": 127147978,
+      "n_buildings": 145332,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "14100",
+      "city_name": "Yokohama-shi",
+      "dataset_year": 2024,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-14100-2024-v1.tar.zst",
+      "sha256": "0939737f365080ab5544a583273910a9bb75b3a04a79fbd8db5e61ee68f7f2d4",
+      "bytes": 735167795,
+      "n_buildings": 882831,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "14204",
+      "city_name": "Kamakura-shi",
+      "dataset_year": 2024,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-14204-2024-v1.tar.zst",
+      "sha256": "cc3c0c4e9bdbfea2bffe655e4287f92e276095bca4d6406a8b7434f112c30cdc",
+      "bytes": 66073379,
+      "n_buildings": 69111,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "23100",
+      "city_name": "Nagoya-shi",
+      "dataset_year": 2022,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-23100-2022-v1.tar.zst",
+      "sha256": "5719f6f3a17dd77dd407dc01dd5717871507b4b323be7cc6fa4646d158b25aab",
+      "bytes": 636168643,
+      "n_buildings": 736866,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "27100",
+      "city_name": "Osaka-shi",
+      "dataset_year": 2024,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-27100-2024-v1.tar.zst",
+      "sha256": "e4b3cfeb9b8afa55ea4260c9e1f89f78ec2c088a82fe0ce03df53ae60a0664bc",
+      "bytes": 562585461,
+      "n_buildings": 615513,
+      "tool_version": "0.1.0"
+    },
+    {
+      "city_code": "40130",
+      "city_name": "Fukuoka-shi",
+      "dataset_year": 2024,
+      "bundle_url": "https://github.com/pixelx-jp/plateau-parquet/releases/download/data-v1/plateau-40130-2024-v1.tar.zst",
+      "sha256": "6d119eb357e07380377564144227f6f134db2c97cf62210f9378184ac6dbcf3f",
+      "bytes": 306280573,
+      "n_buildings": 355388,
       "tool_version": "0.1.0"
     }
   ]
