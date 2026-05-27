@@ -97,7 +97,7 @@ def apply_coverage(
             "explicit_polygon": 3,
         }
         prev_conf = out.loc[hits, col_conf]
-        new_conf = ext.confidence.value if hasattr(ext.confidence, "value") else str(ext.confidence)
+        new_conf = ext.confidence.value
         out.loc[hits, col_conf] = [
             new_conf if order[new_conf] >= order[c] else c for c in prev_conf
         ]

@@ -24,6 +24,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import geopandas as gpd
+from pyogrio.errors import DataLayerError, DataSourceError
+from shapely.errors import GEOSException
 
 from plateau_bridge.catalog import DatasetEntry
 from plateau_bridge.schema import CoverageConfidence, HazardKind
@@ -121,7 +123,7 @@ def resolve_coverage(
                 geometry=merged,
                 confidence=CoverageConfidence.EXPLICIT_POLYGON,
             )
-        except Exception as e:  # noqa: BLE001
+        except (OSError, ValueError, DataSourceError, DataLayerError, GEOSException) as e:
             log.warning("failed to load coverage extent %s: %s", src, e)
 
     # 1b. KSJ auto-resolve via metadata XML + bundled mapping table.
@@ -190,7 +192,7 @@ def resolve_coverage(
                     geometry=merged,
                     confidence=CoverageConfidence.INUNDATION_BOUNDED,
                 )
-        except Exception as e:  # noqa: BLE001
+        except (ValueError, GEOSException) as e:
             log.warning("inundation-bounded extent failed for %s: %s", entry.dataset_id, e)
 
     # 2. Declared full-admin.
