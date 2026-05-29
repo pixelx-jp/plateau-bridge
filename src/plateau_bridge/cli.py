@@ -244,6 +244,39 @@ def build(
             )
 
 
+@app.command("pull")
+def pull(
+    city: str = typer.Argument(
+        ..., autocompletion=_complete_city,
+        help="City slug (`shibuya`) or 5-digit JIS code (`13113`)",
+    ),
+    out_dir: Path = typer.Option(None, "--out", "-o", help="Destination (default: ./out_<city>)"),
+    index_url: str = typer.Option(None, "--index", help="Custom cache-index JSON URL"),
+    force: bool = typer.Option(False, "--force", help="Overwrite existing out dir"),
+) -> None:
+    """Download a prebuilt city bundle in seconds — skip the build pipeline.
+
+    Fetches buildings.parquet (+ manifest, style tables, pmtiles) from the
+    public release index, verifies its sha256, and extracts it. Use this
+    instead of `plateau build` when you just need the data and don't want to
+    download and process gigabytes of CityGML. (Alias: `plateau cache add`.)
+    """
+    from plateau_bridge.distribution import DEFAULT_INDEX_URL, add
+
+    try:
+        city = resolve_city(city)
+    except KeyError as e:
+        console.print(f"[red]{e}[/red]")
+        raise typer.Exit(1) from e
+    url = index_url or DEFAULT_INDEX_URL
+    try:
+        target = add(city, index_url=url, target_dir=out_dir, force=force)
+    except (KeyError, FileExistsError, RuntimeError) as e:
+        console.print(f"[red]{e}[/red]")
+        raise typer.Exit(1) from e
+    console.print(f"[green]ready[/green] → {target}")
+
+
 @app.command()
 def poster(
     parquet: Path = typer.Argument(Path("out/buildings.parquet"), help="buildings.parquet"),

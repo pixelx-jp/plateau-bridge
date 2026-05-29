@@ -66,6 +66,9 @@ One command:
 plateau build shibuya              # or 13113
 ```
 
+> Just want the data without processing gigabytes of CityGML? Grab a prebuilt,
+> sha256-verified bundle in seconds: `plateau pull shibuya` (~30 cities).
+
 …produces:
 
 | Artifact | For | Format |
