@@ -11,6 +11,14 @@
       #legend h1 { margin: 0 0 6px 0; font-size: 14px; font-weight: 600; }
       .swatch { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
       #attr { position: fixed; bottom: 8px; right: 12px; font-size: 11px; opacity: 0.6; }
+      @media (max-width: 720px) {
+        #legend { top: 8px; left: 8px; right: 8px; font-size: 12px; padding: 10px 12px; }
+        #legend h1 { font-size: 13px; }
+        #info { top: auto !important; bottom: 34px !important; left: 8px !important; right: 8px !important; max-width: none !important; }
+        /* pointer/keyboard hints don't apply on touch — hide to declutter */
+        #controls { display: none !important; }
+        #attr { left: 8px; right: 8px; text-align: center; font-size: 10px; }
+      }
     </style>
   </head>
   <body>

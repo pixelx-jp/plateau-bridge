@@ -12,6 +12,16 @@
       #legend a { color: #93c5fd; pointer-events: auto; }
       #attr { position: fixed; bottom: 8px; right: 12px; font-size: 11px; opacity: 0.6; z-index: 10; pointer-events: none; }
       .swatch { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
+      @media (max-width: 720px) {
+        #legend {
+          top: 8px; left: 8px; right: 8px; max-width: none;
+          font-size: 12px; padding: 10px 12px;
+          max-height: 50vh; overflow-y: auto;
+          pointer-events: auto; /* allow scrolling the long note on touch */
+          -webkit-overflow-scrolling: touch;
+        }
+        #attr { left: 8px; right: 8px; text-align: center; font-size: 10px; }
+      }
     </style>
   </head>
   <body>
