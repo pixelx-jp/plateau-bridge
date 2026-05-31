@@ -125,6 +125,29 @@ def _sanitise_uro_duplicates(src: Path, dst: Path) -> int:
     return removed
 
 
+def _file_contains(path: Path, needle: bytes, chunk_size: int = 1 << 20) -> bool:
+    """Stream-scan ``path`` for ``needle`` without loading it into memory.
+
+    PLATEAU building GML bundles can be multiple GB; the previous marker check
+    did ``path.read_text()``, materializing the entire file as a Python string
+    (plus a UTF-8 decode) just to run one substring search. This reads in 1 MiB
+    chunks, returns as soon as the marker is found, and keeps only a small
+    overlap so a marker straddling a chunk boundary is still detected. ``needle``
+    must be ASCII (our markers are), so a byte search matches the old UTF-8 one.
+    """
+    overlap = len(needle) - 1
+    with path.open("rb") as fh:
+        tail = b""
+        while True:
+            chunk = fh.read(chunk_size)
+            if not chunk:
+                return False
+            buf = tail + chunk
+            if needle in buf:
+                return True
+            tail = buf[-overlap:] if overlap else b""
+
+
 def _maybe_sanitise_inputs(gml_args: list[str], work_dir: Path) -> list[str]:
     """Pre-process inputs to strip nusamai-breaking schema violations.
 
@@ -146,9 +169,10 @@ def _maybe_sanitise_inputs(gml_args: list[str], work_dir: Path) -> list[str]:
             out.append(p)
             continue
         # Cheap pre-check: only files that contain the marker text are worth
-        # parsing. Saves an XML parse on every clean file (~95 % of them).
+        # parsing. Saves an XML parse on every clean file (~95 % of them), and
+        # streams the scan so we never hold a multi-GB file in memory at once.
         try:
-            if "bldgRealEstateIDAttribute" not in src.read_text(encoding="utf-8", errors="ignore"):
+            if not _file_contains(src, b"bldgRealEstateIDAttribute"):
                 out.append(p)
                 continue
         except OSError:

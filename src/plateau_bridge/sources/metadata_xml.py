@@ -24,6 +24,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
@@ -68,8 +69,14 @@ _SOURCE_DOC_TAIL = re.compile(r"（[^）]*）.*$")
 # Matches `（平成29年7月20日）国土交通省関東地方整備局…` — strip to bare name.
 
 
+@lru_cache(maxsize=256)
 def parse_metadata_xml(path: Path) -> MetadataExtract | None:
-    """Parse one PLATEAU metadata XML. Returns ``None`` on read / parse error."""
+    """Parse one PLATEAU metadata XML. Returns ``None`` on read / parse error.
+
+    Cached by path: coverage resolution walks the same metadata files once per
+    hazard kind (5×/city), and these XMLs are static for the duration of a
+    build. ``MetadataExtract`` is an immutable dataclass so sharing is safe.
+    """
     try:
         tree = ET.parse(path)
     except (ET.ParseError, OSError) as e:
@@ -84,12 +91,17 @@ def parse_metadata_xml(path: Path) -> MetadataExtract | None:
     return MetadataExtract(title=title, bbox=bbox, source_documents=source_docs)
 
 
-def find_metadata_files(dataset_root: Path) -> list[Path]:
-    """Locate every ``metadata/udx_*_op.xml`` under a dataset root."""
+@lru_cache(maxsize=64)
+def find_metadata_files(dataset_root: Path) -> tuple[Path, ...]:
+    """Locate every ``metadata/udx_*_op.xml`` under a dataset root.
+
+    Cached + returns a tuple: the same directory is globbed once per hazard
+    kind during coverage resolution; the result is immutable so it's safe to
+    share. Callers iterate it, never mutate."""
     meta_dir = dataset_root / "metadata"
     if not meta_dir.is_dir():
-        return []
-    return sorted(p for p in meta_dir.glob("udx_*_op.xml") if p.is_file())
+        return ()
+    return tuple(sorted(p for p in meta_dir.glob("udx_*_op.xml") if p.is_file()))
 
 
 def canonicalise_source_document(s: str) -> str:

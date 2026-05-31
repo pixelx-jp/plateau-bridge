@@ -17,6 +17,7 @@ import json
 import logging
 import struct
 from collections.abc import Iterator
+from functools import lru_cache
 from pathlib import Path
 
 log = logging.getLogger(__name__)
@@ -127,13 +128,21 @@ def _extract_gml_ids_from_glb(glb_path: Path) -> list[str] | None:
     return None
 
 
-def collect_tile_placements(tileset_dir: Path) -> list[tuple[str, str, int]]:
+@lru_cache(maxsize=4)
+def collect_tile_placements(tileset_dir: Path) -> tuple[tuple[str, str, int], ...]:
     """Walk the tileset and return every (gml_id, tile_content_uri, tile_feature_id).
 
     nusamai emits the same building at every LOD it spans (15/16/17/18) — each
     copy has its own EXT_structural_metadata with a tile-local feature_id. We
     need the full cross product so style tables can be written for ALL LODs,
     not just whichever was walked last.
+
+    This loads and parses *every* GLB in the tileset (often thousands, each
+    10–100 MB) to read its property table — by far the heaviest step in Gate B,
+    which calls this twice for the same dir (once via :func:`attach_tile_keys`,
+    once for style-table emission). Cached by ``tileset_dir`` so the second call
+    is free; results are an immutable tuple so the shared cache can't be
+    corrupted. The build output is static for the duration of a gate.
     """
     out: list[tuple[str, str, int]] = []
     for uri, _ in walk_tileset(tileset_dir / "tileset.json"):
@@ -145,7 +154,7 @@ def collect_tile_placements(tileset_dir: Path) -> list[tuple[str, str, int]]:
             continue
         for feature_id, gid in enumerate(ids):
             out.append((gid, uri, feature_id))
-    return out
+    return tuple(out)
 
 
 def attach_tile_keys(
