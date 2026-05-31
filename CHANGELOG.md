@@ -5,6 +5,17 @@ and Semantic Versioning.
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-05-31
+
+### Performance
+- CityGML pre-check streams the duplicate-uro marker scan in 1 MiB chunks
+  (early-exit, small overlap for boundary-straddling matches) instead of
+  `read_text()` loading a multi-GB GML fully into memory.
+- `collect_tile_placements` is cached per tileset dir so Gate B's two calls
+  don't both load every GLB (10–100 MB each); returns an immutable tuple.
+- `parse_metadata_xml` / `find_metadata_files` are cached so the same metadata
+  files aren't re-parsed once per hazard kind during coverage resolution.
+
 ### 8 cities × full ABC artifact bundle, click-to-inspect, gate B/C resumable
 
 - **All 5 new cities** now have Gate B + Gate C artifacts on disk:
