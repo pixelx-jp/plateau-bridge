@@ -129,3 +129,24 @@ def test_verify_catches_duplicate_uid(tmp_path: Path) -> None:
     out = _make_bundle(tmp_path, [_baseline_row("u1"), _baseline_row("u1")])
     report = verify(out)
     assert any(f.code == "uid_not_unique" for f in report.findings)
+
+
+def test_verify_catches_condition_honesty_violation(tmp_path: Path) -> None:
+    # extension A: condition_covered=false must not carry a state
+    out = _make_bundle(
+        tmp_path,
+        [_baseline_row("u1", condition_covered=False, condition_state="危険")],
+    )
+    report = verify(out)
+    assert "honesty_violation" in [f.code for f in report.findings]
+    assert not report.ok()
+
+
+def test_verify_passes_clean_condition(tmp_path: Path) -> None:
+    out = _make_bundle(
+        tmp_path,
+        [_baseline_row("u1", condition_covered=True, condition_state="調査済",
+                       condition_confidence=0.8, condition_confidence_tier="inferred")],
+    )
+    report = verify(out)
+    assert report.ok(), [f.code for f in report.errors]

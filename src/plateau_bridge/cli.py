@@ -394,6 +394,29 @@ def bench(
     console.print(table)
 
 
+@app.command("export-world")
+def export_world_cmd(
+    parquet: Path = typer.Argument(Path("out/buildings.parquet"), help="buildings.parquet"),
+    out: Path = typer.Option(Path("world"), "--out", "-o", help="Output world/ directory"),
+    name: str = typer.Option("plateau_world", "--name", help="SDF world name"),
+    max_buildings: int = typer.Option(None, "--max", help="Cap building count (debugging)"),
+) -> None:
+    """Export a buildings.parquet to an SDF world + record sidecar (extension B).
+
+    Shared by sixth-sense (Nav2 costmap) and terra-incognita (headless). The
+    sidecar joins each SDF feature_id back to the record layer and keeps
+    'unsurveyed' as an explicit layer — never free space.
+    """
+    from plateau_bridge.world_export import export_world
+    res = export_world(parquet, out, world_name=name, max_buildings=max_buildings)
+    console.print(f"[bold cyan]export-world[/bold cyan] → {res.out_dir}")
+    console.print(f"  sdf:     {res.sdf_path}  ({res.n_features:,} buildings)")
+    console.print(f"  sidecar: {res.sidecar_path}")
+    console.print(
+        f"  index:   {res.index_path}  origin=({res.origin_lat:.5f},{res.origin_lon:.5f})"
+    )
+
+
 @app.command()
 def verify(
     out_dir: Path = typer.Argument(Path("out"), help="Output directory from `plateau build`"),
