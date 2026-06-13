@@ -14,7 +14,7 @@ from enum import StrEnum
 from typing import Literal
 
 import pyarrow as pa
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 ATTRIBUTION = "© Project PLATEAU / MLIT (CC BY 4.0)"
 
@@ -42,6 +42,21 @@ class Usage(StrEnum):
     EDUCATIONAL = "educational"
     PUBLIC = "public"
     OTHER = "other"
+
+
+class ConditionState(StrEnum):
+    """Observed post-disaster triage state of a building (extension A).
+
+    Mirrors Japan's 応急危険度判定 red/yellow/green tags. The fourth state,
+    未調査 (not surveyed), is NOT a member here — it is represented honestly by
+    ``condition_covered = false`` with ``condition_state = null`` (the same
+    ``covered=false ⇒ value=null`` invariant the hazard columns already obey).
+    Written by plateau-triage; stored + served + verified here.
+    """
+
+    DANGER = "危険"
+    CAUTION = "要注意"
+    INSPECTED = "調査済"
 
 
 class CoverageConfidence(StrEnum):
@@ -73,6 +88,27 @@ class CoverageConfidence(StrEnum):
     INUNDATION_BOUNDED = "inundation_bounded"
     DECLARED_FULL_ADMIN = "declared_full_admin"
     UNKNOWN = "unknown"
+
+
+# The record `attribute` the condition columns populate (extension A).
+CONDITION_ATTRIBUTE = "damage_state"
+
+
+def condition_columns() -> dict[str, pa.DataType]:
+    """The observation-state column group (extension A), all nullable.
+
+    Optional: only populated when an observation layer (e.g. plateau-triage)
+    writes it. Same honesty rule as hazards — ``condition_covered=false`` keeps
+    ``condition_state`` / ``condition_confidence`` null.
+    """
+    return {
+        "condition_covered": pa.bool_(),
+        "condition_state": pa.string(),  # ConditionState value, or null
+        "condition_confidence": pa.float32(),
+        "condition_confidence_tier": pa.string(),
+        "condition_source_ids": pa.string(),
+        "condition_observed_at": pa.string(),  # RFC 3339
+    }
 
 
 # Hazard kinds that report a depth value. Landslide reports a zone flag instead.
@@ -134,6 +170,9 @@ def _build_arrow_schema() -> pa.Schema:
     for kind in HazardKind:
         for name, dtype in hazard_columns(kind).items():
             fields.append(pa.field(name, dtype))
+    # extension A — optional observation-state columns (all nullable)
+    for name, dtype in condition_columns().items():
+        fields.append(pa.field(name, dtype))
     return pa.schema(fields)
 
 
@@ -152,6 +191,33 @@ class HazardField(BaseModel):
     in_zone: bool | None = None  # only for landslide
     hit_source_ids: list[str] = Field(default_factory=list)
     coverage_confidence: CoverageConfidence = CoverageConfidence.UNKNOWN
+
+
+class ConditionField(BaseModel):
+    """In-memory observation-state tuple for one building (extension A).
+
+    Enforces the honesty invariant: ``covered=false`` (未調査) keeps ``state``
+    and ``confidence`` null — a building nobody surveyed is never defaulted to
+    a state.
+    """
+
+    model_config = ConfigDict(use_enum_values=True)
+
+    covered: bool = False
+    state: ConditionState | None = None
+    confidence: float | None = None
+    confidence_tier: str | None = None
+    source_ids: list[str] = Field(default_factory=list)
+    observed_at: str | None = None
+
+    @model_validator(mode="after")
+    def _honesty(self) -> ConditionField:
+        if not self.covered and (self.state is not None or self.confidence is not None):
+            raise ValueError(
+                "condition honesty invariant: covered=false requires state=None "
+                "and confidence=None"
+            )
+        return self
 
 
 class Building(BaseModel):
@@ -183,6 +249,7 @@ class Building(BaseModel):
     source_dataset_id: str
     attribution: str = ATTRIBUTION
     hazards: dict[HazardKind, HazardField] = Field(default_factory=dict)
+    condition: ConditionField | None = None  # extension A — optional observation state
 
 
 class CoverageStats(BaseModel):

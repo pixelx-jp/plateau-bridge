@@ -118,6 +118,24 @@ def verify(out_dir: Path) -> VerifyReport:
                     )
                 )
 
+    # 3b. Condition honesty invariant (extension A): condition_covered=false
+    #     MUST NOT carry a state or confidence. Only checked when present.
+    if "condition_covered" in cols:
+        for val_col in ("condition_state", "condition_confidence"):
+            if val_col in cols:
+                row = con.execute(
+                    f"SELECT COUNT(*) FROM b "
+                    f"WHERE NOT condition_covered AND {val_col} IS NOT NULL"
+                ).fetchone()
+                if row and row[0] > 0:
+                    findings.append(
+                        Finding(
+                            "error",
+                            "honesty_violation",
+                            f"{row[0]} rows have {val_col} set while condition_covered=false",
+                        )
+                    )
+
     # 4. Manifest cross-consistency.
     if manifest is not None:
         if manifest.n_buildings != n:
