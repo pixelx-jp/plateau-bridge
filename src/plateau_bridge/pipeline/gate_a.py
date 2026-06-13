@@ -25,12 +25,14 @@ from plateau_bridge.config import load_settings
 from plateau_bridge.manifest import build_manifest, write_manifest
 from plateau_bridge.ops.attributes import field_coverage, normalise
 from plateau_bridge.ops.intersect import apply_coverage, apply_hazards
+from plateau_bridge.ops.seismic import apply_seismic
 from plateau_bridge.ops.uid import batch_uids
 from plateau_bridge.schema import ATTRIBUTION
 from plateau_bridge.sources.citygml import convert_buildings, load_geojson
 from plateau_bridge.sources.coverage import resolve_coverage
 from plateau_bridge.sources.download import fetch_and_unzip
 from plateau_bridge.sources.hazard import load_hazard
+from plateau_bridge.sources.jshis import JSHIS_SOURCE_ID, JshisMeshProvider
 
 log = logging.getLogger(__name__)
 
@@ -56,6 +58,7 @@ def run_gate_a(
     emit_3dtiles: bool = True,
     clip_to_admin: bool = True,
     skip_hazards: bool = False,
+    seismic_provider: JshisMeshProvider | None = None,
 ) -> GateAResult:
     settings = load_settings()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -170,6 +173,18 @@ def run_gate_a(
 
     gdf = apply_coverage(gdf, extents)
     gdf = apply_hazards(gdf, layers)
+
+    # 4b. Earthquake (J-SHIS 250m mesh) — national, joined by mesh code, not
+    # polygon intersection (extension B). Opt-in: with no provider the columns
+    # exist but stay 'unknown' (offline/unit builds need no network).
+    gdf = apply_seismic(gdf, seismic_provider)
+    if seismic_provider is None:
+        notes.append("earthquake (J-SHIS) skipped; earthquake_* columns are 'unknown'")
+    else:
+        covered = int(gdf["earthquake_covered"].sum())
+        notes.append(
+            f"earthquake (J-SHIS {JSHIS_SOURCE_ID}): {covered:,}/{len(gdf):,} buildings covered"
+        )
 
     # Pre-populate Gate B / Gate C columns as nulls so the parquet schema is
     # stable from Gate A onward. Downstream gates overwrite these in place.

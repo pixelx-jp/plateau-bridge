@@ -71,6 +71,14 @@ DEFAULT_PMTILES_PROPERTIES: tuple[str, ...] = (
     "landslide_coverage_source_ids",
     "landslide_in_zone",
     "landslide_hit_source_ids",
+    # earthquake (J-SHIS 250m mesh — national, extension B). Carried so 2D
+    # renderers can shade buildings by seismic probability without a backend
+    # call — the building-level earthquake layer downstream apps were missing.
+    "earthquake_covered",
+    "earthquake_coverage_confidence",
+    "earthquake_prob_strong_shaking_30yr",
+    "earthquake_amplification",
+    "earthquake_source_ids",
 )
 
 

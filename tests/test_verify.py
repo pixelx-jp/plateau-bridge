@@ -107,6 +107,68 @@ def test_verify_catches_honesty_violation(tmp_path: Path) -> None:
     assert not report.ok()
 
 
+def test_verify_catches_seismic_honesty_violation(tmp_path: Path) -> None:
+    # earthquake_covered=false but a probability is present → uncovered "value"
+    # = the same lie as a flood depth without coverage. Must be an error.
+    out = _make_bundle(
+        tmp_path,
+        [
+            _baseline_row(
+                "eq1",
+                earthquake_covered=False,
+                earthquake_prob_strong_shaking_30yr=0.3,
+            )
+        ],
+    )
+    report = verify(out)
+    assert any(
+        f.code == "honesty_violation" and "earthquake" in f.message for f in report.errors
+    )
+
+
+def test_verify_uncovered_nan_seismic_is_not_a_violation(tmp_path: Path) -> None:
+    # Real builds write NaN (not NULL) into uncovered float cells. NaN is not a
+    # "value" — it must NOT be flagged as a covered=false honesty violation.
+    out = _make_bundle(
+        tmp_path,
+        [
+            _baseline_row(
+                "eq1",
+                earthquake_covered=False,
+                earthquake_prob_strong_shaking_30yr=float("nan"),
+                earthquake_amplification=float("nan"),
+            )
+        ],
+    )
+    report = verify(out)
+    assert not any(
+        f.code == "honesty_violation" and "earthquake" in f.message for f in report.errors
+    )
+
+
+def test_verify_clean_seismic_passes(tmp_path: Path) -> None:
+    # covered=true with a probability is legitimate → no honesty error from seismic.
+    out = _make_bundle(
+        tmp_path,
+        [
+            _baseline_row(
+                "eq1",
+                river_flood_covered=True,
+                river_flood_coverage_source_ids="fld-99999",
+                river_flood_coverage_confidence="explicit_polygon",
+                river_flood_depth_max=2.5,
+                earthquake_covered=True,
+                earthquake_prob_strong_shaking_30yr=0.3,
+                earthquake_amplification=1.6,
+            )
+        ],
+    )
+    report = verify(out)
+    assert not any(
+        f.code == "honesty_violation" and "earthquake" in f.message for f in report.errors
+    )
+
+
 def test_verify_passes_clean_bundle(tmp_path: Path) -> None:
     out = _make_bundle(
         tmp_path,

@@ -136,6 +136,28 @@ def verify(out_dir: Path) -> VerifyReport:
                         )
                     )
 
+    # 3c. Earthquake honesty invariant (extension B): earthquake_covered=false
+    #     MUST NOT carry a probability or amplification. Only checked when present
+    #     (extension columns are optional, like condition).
+    if "earthquake_covered" in cols:
+        for val_col in ("earthquake_prob_strong_shaking_30yr", "earthquake_amplification"):
+            if val_col in cols:
+                # `> 0` (not just IS NOT NULL) so a NaN sentinel in an uncovered
+                # float cell isn't mistaken for a real value — mirrors the depth
+                # hazard check above. Real prob/ARV are strictly positive.
+                row = con.execute(
+                    f"SELECT COUNT(*) FROM b "
+                    f"WHERE NOT earthquake_covered AND {val_col} IS NOT NULL AND {val_col} > 0"
+                ).fetchone()
+                if row and row[0] > 0:
+                    findings.append(
+                        Finding(
+                            "error",
+                            "honesty_violation",
+                            f"{row[0]} rows have {val_col} set while earthquake_covered=false",
+                        )
+                    )
+
     # 4. Manifest cross-consistency.
     if manifest is not None:
         if manifest.n_buildings != n:
