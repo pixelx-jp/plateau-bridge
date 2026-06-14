@@ -79,6 +79,12 @@ DEFAULT_PMTILES_PROPERTIES: tuple[str, ...] = (
     "earthquake_prob_strong_shaking_30yr",
     "earthquake_amplification",
     "earthquake_source_ids",
+    # flood susceptibility (DEM HAND — terrain reference, extension C)
+    "flood_susceptibility_covered",
+    "flood_susceptibility_level",
+    "flood_susceptibility_hand_m",
+    "flood_susceptibility_coverage_confidence",
+    "flood_susceptibility_source_ids",
 )
 
 

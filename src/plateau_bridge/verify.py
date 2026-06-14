@@ -158,6 +158,23 @@ def verify(out_dir: Path) -> VerifyReport:
                         )
                     )
 
+    # 3d. Flood-susceptibility honesty (extension C): covered=false MUST NOT
+    #     carry a HAND value. Only checked when present (optional extension).
+    if "flood_susceptibility_covered" in cols and "flood_susceptibility_hand_m" in cols:
+        row = con.execute(
+            "SELECT COUNT(*) FROM b WHERE NOT flood_susceptibility_covered "
+            "AND flood_susceptibility_hand_m IS NOT NULL "
+            "AND NOT isnan(flood_susceptibility_hand_m)"  # uncovered cells are NaN, not a value
+        ).fetchone()
+        if row and row[0] > 0:
+            findings.append(
+                Finding(
+                    "error",
+                    "honesty_violation",
+                    f"{row[0]} rows have flood_susceptibility_hand_m set while covered=false",
+                )
+            )
+
     # 4. Manifest cross-consistency.
     if manifest is not None:
         if manifest.n_buildings != n:

@@ -135,6 +135,12 @@ def build(
              "amplification) into the earthquake_* columns. Adds ~one HTTP call per "
              "unique 250m cell at build time (cached); requires network.",
     ),
+    flood_susceptibility: bool = typer.Option(
+        False, "--flood-susceptibility",
+        help="Bake DEM-derived flood susceptibility (HAND from GSI DEM) into the "
+             "flood_susceptibility_* columns. A terrain reference, NOT an official "
+             "浸水想定. Downloads DEM tiles at build time; requires network.",
+    ),
     prune_cache: bool = typer.Option(
         False, "--prune-cache",
         help="After a successful build, delete this city's unzipped dataset "
@@ -173,9 +179,12 @@ def build(
             from plateau_bridge.sources.jshis import JshisMeshProvider
             seismic_provider = JshisMeshProvider()
             console.print("  [dim]earthquake: J-SHIS 250m mesh enabled (--seismic)[/dim]")
+        if flood_susceptibility:
+            console.print("  [dim]flood_susceptibility: GSI-DEM HAND enabled (--flood-susceptibility)[/dim]")
         a_result = run_gate_a(
             catalog, out, emit_3dtiles=not skip_3dtiles, admin_boundary=admin_arg,
             skip_hazards=no_hazards, seismic_provider=seismic_provider,
+            flood_susceptibility=flood_susceptibility,
         )
         console.print(f"  → {a_result.buildings_parquet}")
 
