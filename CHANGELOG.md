@@ -5,6 +5,22 @@ and Semantic Versioning.
 
 ## [Unreleased]
 
+### Added
+- **DEM-derived flood susceptibility (HAND)** — a terrain-derived flood
+  *reference* (Height Above Nearest Drainage from GSI DEM), NOT an official
+  浸水想定. Opt-in, off by default; same honesty invariant (`covered=false ⇒
+  level/HAND null`; "low" is never "safe").
+  - `ops/hand.py` — GSI dem_png mosaic (Web-Mercator) → pysheds flowdir/
+    accumulation → drainage from a physical catchment threshold (≥2 km², so the
+    signal discriminates terrain instead of collapsing to HAND≈0 everywhere) →
+    `compute_hand` → per-building sample → low/medium/high (bands 3/10 m).
+  - `schema.py` — `flood_susceptibility_*` columns + `FloodSusceptibilityField`.
+  - CLI: opt-in `plateau build CITY --flood-susceptibility`; `verify.py`
+    NaN-safe honesty check; `ops/pmtiles.py` carries the columns; `hand` extra
+    (pysheds, pillow).
+  - Validated: HAND discriminates terrain and agrees directionally with the
+    official flood zones (in-zone buildings skew HAND-high).
+
 ## [0.2.0] — 2026-06-14
 
 Two add-only record-layer feature PRs (#1, #2). No existing columns, CLI
