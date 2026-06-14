@@ -130,22 +130,28 @@ To unlock `explicit_polygon` (one tier stronger than `inundation_bounded`) for a
 ```
 plateau_bridge/
 ├── catalog.py       # PLATEAU Data Catalog API client
-├── schema.py        # Pydantic models: Building, HazardField, Manifest
+├── schema.py        # Pydantic models: Building, HazardField, ConditionField, EarthquakeField, Manifest
 ├── sources/         # I/O for each source format
 │   ├── citygml.py   # MIERUNE plateau-gis-converter wrapper
-│   ├── hazard.py    # 5 hazard themes
+│   ├── hazard.py    # 5 PLATEAU polygon hazard themes
+│   ├── jshis.py     # J-SHIS 250m-mesh seismic provider (injectable fetch, per-cell cache)
 │   ├── coverage.py  # explicit / declared / unknown resolver
 │   └── zoning.py    # 都市規劃 GML → zoning_use, far_max
 ├── ops/             # Pure transforms
 │   ├── uid.py            # building_uid = {city}/{year}/{file}/{gml_id}
 │   ├── intersect.py      # spatial join, multi-source max
+│   ├── meshcode.py       # JIS X 0410 250m (1/4) mesh code from centroid
+│   ├── seismic.py        # centroid → mesh → J-SHIS value join
 │   ├── style_table.py    # Arrow IPC per tile_content_uri
 │   ├── pmtiles.py        # tippecanoe wrapper
 │   └── flatgeobuf.py     # full-precision per-ward FGB
 ├── pipeline/        # Gate A / B / C orchestration
+├── records.py       # universal honest Record model (state/rules/hazard)
+├── query.py         # RecordQuery over buildings.parquet (DuckDB): get_record / query_point / coverage / cite
+├── world_export.py  # buildings.parquet → world.sdf + record_sidecar.parquet + index.json
 ├── manifest.py      # Provenance + coverage stats writer
 ├── attribution.py   # Auto-injects "© Project PLATEAU / MLIT (CC BY 4.0)"
-└── cli.py           # `plateau build|info|cache` (Typer)
+└── cli.py           # `plateau build|info|cache|verify|export-world` (Typer)
 ```
 
 Each `Gate` is independently verifiable; a failure in Gate A blocks `colorBy` shading but does not affect 2D risk-mapping outputs. See [docs/architecture.md](docs/architecture.md) for the dependency graph.
@@ -452,7 +458,6 @@ mapping covers 99-100 % of each city's buildings via the
 
 ## Out of scope (v1)
 
-- 🚫 **Earthquake intensity** — not in PLATEAU; needs J-SHIS API. v2.
 - 🚫 **Real-time data** — everything is a dated snapshot.
 - 🚫 **Indoor LOD4** — LOD0–2 only for now.
 

@@ -5,6 +5,40 @@ and Semantic Versioning.
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-06-14
+
+Two add-only record-layer feature PRs (#1, #2). No existing columns, CLI
+commands, or manifest fields renamed or removed; the honesty invariant
+`covered=false ⇒ value=null` is preserved and now also enforced at the
+record boundary.
+
+### Added
+- **Earthquake (J-SHIS 250m mesh) layer** — a nationwide seismic hazard joined
+  by JIS X 0410 250m mesh code (not spatial intersection): per-building
+  centroid → mesh code → J-SHIS value. 30yr probability of JMA intensity
+  6-lower+ (`T30_I55_PS`) plus surface amplification (ARV).
+  - `ops/meshcode.py` — 250m (1/4) mesh code computation.
+  - `sources/jshis.py` — `JshisMeshProvider` (injectable fetch, per-cell cache).
+  - `ops/seismic.py` — `apply_seismic` centroid→mesh→value join.
+  - `schema.py` — `seismic_columns()` + `EarthquakeField`, same honesty
+    invariant as polygon hazards (`covered=false ⇒ value null`, never a silent 0).
+  - CLI: opt-in `plateau build CITY --seismic` (offline/unit builds leave the
+    columns `unknown`, so default behaviour and existing tests are unchanged).
+  - `ops/pmtiles.py` — `earthquake_*` carried into tiles for backend-free 2D shading.
+- **Shared record-query + honesty core** — `records.py` (universal honest
+  `Record` model) + `query.py` (`RecordQuery` over `buildings.parquet` via
+  DuckDB: `get_record` / `query_point` / `query_asset` / `coverage` / `cite`).
+  A building outside a hazard's modelled coverage resolves to
+  `covered=false, value=null` — never defaulted to depth 0 / safe.
+- **Condition columns** — `ConditionState` (危険/要注意/調査済) + nullable
+  `condition_*` columns + `ConditionField` (未調査 = `condition_covered=false`,
+  not a fourth enum member).
+- **World export** — `world_export.py` + `plateau export-world`:
+  `buildings.parquet` → `world.sdf` + `record_sidecar.parquet` + `index.json`.
+  "Unsurveyed" is an explicit layer, never free space.
+- `verify.py` — condition/earthquake honesty checks (`covered=false` must
+  carry no value; NaN-safe like depth).
+
 ## [0.1.2] — 2026-05-31
 
 ### Performance

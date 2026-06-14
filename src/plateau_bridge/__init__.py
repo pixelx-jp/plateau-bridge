@@ -1,6 +1,6 @@
 """plateau-bridge: a trustworthy building index + hazard intersection pipeline for PLATEAU."""
 
-__version__ = "0.1.2"
+__version__ = "0.2.0"
 
 from plateau_bridge.schema import Building, HazardKind, Manifest
 

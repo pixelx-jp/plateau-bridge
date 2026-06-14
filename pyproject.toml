@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "plateau-bridge"
-version = "0.1.2"
+version = "0.2.0"
 description = "A trustworthy building index + hazard intersection pipeline for Project PLATEAU."
 readme = "README.md"
 license = { text = "MIT" }
