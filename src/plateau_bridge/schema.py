@@ -111,6 +111,30 @@ def condition_columns() -> dict[str, pa.DataType]:
     }
 
 
+def seismic_columns() -> dict[str, pa.DataType]:
+    """The earthquake column group (extension B), all nullable except ``covered``.
+
+    Unlike the 5 PLATEAU hazards (designated-zone polygons), earthquake comes
+    from J-SHIS's nationwide **250 m probabilistic ground-motion mesh** — every
+    building's centroid falls in exactly one mesh cell, so coverage is national
+    rather than polygon-bounded. Same honesty rule as the hazards and condition
+    groups: ``earthquake_covered=false`` (J-SHIS unreachable / outside the
+    published mesh) keeps the probability and amplification null — never a
+    silent 0 (which would read as "no seismic risk").
+    """
+    return {
+        "earthquake_covered": pa.bool_(),
+        # 30-year probability of JMA seismic intensity 6-lower or above (0..1).
+        "earthquake_prob_strong_shaking_30yr": pa.float32(),
+        # 表層地盤増幅率 (ARV, Vs=400m/s → surface); amplifies shaking & liquefaction.
+        "earthquake_amplification": pa.float32(),
+        # The 250 m mesh code the values were joined from (provenance/debug).
+        "earthquake_meshcode": pa.string(),
+        "earthquake_source_ids": pa.string(),
+        "earthquake_coverage_confidence": pa.string(),
+    }
+
+
 # Hazard kinds that report a depth value. Landslide reports a zone flag instead.
 DEPTH_HAZARDS: tuple[HazardKind, ...] = (
     HazardKind.RIVER_FLOOD,
@@ -170,6 +194,9 @@ def _build_arrow_schema() -> pa.Schema:
     for kind in HazardKind:
         for name, dtype in hazard_columns(kind).items():
             fields.append(pa.field(name, dtype))
+    # extension B — earthquake (J-SHIS 250m mesh), nationwide rather than polygon-bounded
+    for name, dtype in seismic_columns().items():
+        fields.append(pa.field(name, dtype))
     # extension A — optional observation-state columns (all nullable)
     for name, dtype in condition_columns().items():
         fields.append(pa.field(name, dtype))
@@ -191,6 +218,39 @@ class HazardField(BaseModel):
     in_zone: bool | None = None  # only for landslide
     hit_source_ids: list[str] = Field(default_factory=list)
     coverage_confidence: CoverageConfidence = CoverageConfidence.UNKNOWN
+
+
+class EarthquakeField(BaseModel):
+    """In-memory earthquake tuple for one building (extension B, J-SHIS).
+
+    Honesty invariant (mirrors hazards/condition): ``covered=false`` keeps the
+    probability and amplification null — a building J-SHIS couldn't be joined to
+    is never defaulted to 0 (which would read as "no seismic risk").
+    """
+
+    model_config = ConfigDict(use_enum_values=True)
+
+    covered: bool = False
+    prob_strong_shaking_30yr: float | None = None  # 0..1; None when not covered
+    amplification: float | None = None  # ARV; None when not covered/unknown
+    meshcode: str | None = None
+    source_ids: list[str] = Field(default_factory=list)
+    coverage_confidence: CoverageConfidence = CoverageConfidence.UNKNOWN
+
+    @model_validator(mode="after")
+    def _honesty(self) -> EarthquakeField:
+        if not self.covered and (
+            self.prob_strong_shaking_30yr is not None or self.amplification is not None
+        ):
+            raise ValueError(
+                "earthquake honesty invariant: covered=false requires "
+                "prob_strong_shaking_30yr=None and amplification=None"
+            )
+        if self.prob_strong_shaking_30yr is not None and not (
+            0.0 <= self.prob_strong_shaking_30yr <= 1.0
+        ):
+            raise ValueError("prob_strong_shaking_30yr must be in [0, 1]")
+        return self
 
 
 class ConditionField(BaseModel):
@@ -249,6 +309,7 @@ class Building(BaseModel):
     source_dataset_id: str
     attribution: str = ATTRIBUTION
     hazards: dict[HazardKind, HazardField] = Field(default_factory=dict)
+    seismic: EarthquakeField | None = None  # extension B — earthquake (J-SHIS 250m mesh)
     condition: ConditionField | None = None  # extension A — optional observation state
 
 

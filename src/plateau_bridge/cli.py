@@ -129,6 +129,12 @@ def build(
         False, "--no-hazards",
         help="Skip hazard intersection (much faster for huge cities; hazard fields stay NULL/unknown)",
     ),
+    seismic: bool = typer.Option(
+        False, "--seismic",
+        help="Bake the nationwide J-SHIS earthquake layer (250m mesh probability + "
+             "amplification) into the earthquake_* columns. Adds ~one HTTP call per "
+             "unique 250m cell at build time (cached); requires network.",
+    ),
     prune_cache: bool = typer.Option(
         False, "--prune-cache",
         help="After a successful build, delete this city's unzipped dataset "
@@ -162,9 +168,14 @@ def build(
         elif admin is not None:
             from plateau_bridge.admin import load_admin_from_path
             admin_arg = load_admin_from_path(admin)
+        seismic_provider = None
+        if seismic:
+            from plateau_bridge.sources.jshis import JshisMeshProvider
+            seismic_provider = JshisMeshProvider()
+            console.print("  [dim]earthquake: J-SHIS 250m mesh enabled (--seismic)[/dim]")
         a_result = run_gate_a(
             catalog, out, emit_3dtiles=not skip_3dtiles, admin_boundary=admin_arg,
-            skip_hazards=no_hazards,
+            skip_hazards=no_hazards, seismic_provider=seismic_provider,
         )
         console.print(f"  → {a_result.buildings_parquet}")
 

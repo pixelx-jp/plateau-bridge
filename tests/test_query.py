@@ -155,3 +155,42 @@ def test_condition_uncovered_is_unknown(parquet):
     with RecordQuery(parquet) as q:
         r = q.get_record("b2", "damage_state")  # b2 has no condition data
         assert r.covered is False and r.value is None
+
+
+# -- extension B: earthquake (J-SHIS 250m mesh) through the same core ------
+
+def _seismic_parquet(tmp_path: Path) -> str:
+    rows = [
+        _row("eq1", 35.6812, 139.7671,
+             earthquake_covered=True,
+             earthquake_prob_strong_shaking_30yr=0.377,
+             earthquake_amplification=1.27,
+             earthquake_meshcode="5339461132",
+             earthquake_coverage_confidence="declared_full_admin",
+             earthquake_source_ids="jshis-pshm-Y2024"),
+        _row("eq2", 36.0, 140.0),  # earthquake_covered None → uncovered
+    ]
+    cols = {name: [r[name] for r in rows] for name in BUILDINGS_ARROW_SCHEMA.names}
+    table = pa.table(cols, schema=BUILDINGS_ARROW_SCHEMA)
+    p = tmp_path / "seismic.parquet"
+    pq.write_table(table, p)
+    return str(p)
+
+
+def test_seismic_attribute_available(tmp_path):
+    with RecordQuery(_seismic_parquet(tmp_path)) as q:
+        assert "earthquake_prob_strong_shaking_30yr" in q.attributes
+
+
+def test_seismic_covered_record(tmp_path):
+    with RecordQuery(_seismic_parquet(tmp_path)) as q:
+        r = q.get_record("eq1", "earthquake_prob_strong_shaking_30yr")
+        assert r.covered is True
+        assert r.value == pytest.approx(0.377, abs=1e-6)
+        assert r.confidence_tier == "modelled"  # J-SHIS is a probabilistic model
+
+
+def test_seismic_uncovered_is_unknown(tmp_path):
+    with RecordQuery(_seismic_parquet(tmp_path)) as q:
+        r = q.get_record("eq2", "earthquake_prob_strong_shaking_30yr")
+        assert r.covered is False and r.value is None

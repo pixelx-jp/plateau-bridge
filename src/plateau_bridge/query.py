@@ -93,6 +93,19 @@ CONDITION_COLS = (
     "condition_observed_at",
 )
 
+# Earthquake (extension B, J-SHIS 250m mesh). The record value is the 30-year
+# probability of strong shaking; covered everywhere J-SHIS resolves a cell.
+SEISMIC_ATTRIBUTE = "earthquake_prob_strong_shaking_30yr"
+SEISMIC_COVERED_COL = "earthquake_covered"
+SEISMIC_COLS = (
+    SEISMIC_COVERED_COL,
+    "earthquake_prob_strong_shaking_30yr",
+    "earthquake_amplification",
+    "earthquake_meshcode",
+    "earthquake_source_ids",
+    "earthquake_coverage_confidence",
+)
+
 # Base (non-attribute) columns every record needs.
 _BASE_COLS = (
     "building_uid",
@@ -132,8 +145,10 @@ class RecordQuery:
     # -- public API (contract §②) ------------------------------------------
     @property
     def attributes(self) -> list[str]:
-        """Attributes available in this parquet (hazards + condition if present)."""
+        """Attributes available in this parquet (hazards + earthquake + condition)."""
         attrs = [a for a, h in HAZARD_ATTRS.items() if h.covered_col in self._cols]
+        if SEISMIC_COVERED_COL in self._cols:
+            attrs.append(SEISMIC_ATTRIBUTE)
         if CONDITION_COVERED_COL in self._cols:
             attrs.append(CONDITION_ATTRIBUTE)
         return attrs
@@ -232,16 +247,27 @@ class RecordQuery:
     def _is_condition(self, attribute: str) -> bool:
         return attribute == CONDITION_ATTRIBUTE
 
+    def _is_seismic(self, attribute: str) -> bool:
+        return attribute == SEISMIC_ATTRIBUTE
+
     def _covered_col(self, attribute: str) -> str:
-        return CONDITION_COVERED_COL if self._is_condition(attribute) else HAZARD_ATTRS[attribute].covered_col
+        if self._is_condition(attribute):
+            return CONDITION_COVERED_COL
+        if self._is_seismic(attribute):
+            return SEISMIC_COVERED_COL
+        return HAZARD_ATTRS[attribute].covered_col
 
     def _require_attr(self, attribute: str) -> str:
         if self._is_condition(attribute):
             if CONDITION_COVERED_COL not in self._cols:
                 raise ValueError(f"attribute {attribute!r} not present in this parquet")
             return attribute
+        if self._is_seismic(attribute):
+            if SEISMIC_COVERED_COL not in self._cols:
+                raise ValueError(f"attribute {attribute!r} not present in this parquet")
+            return attribute
         if attribute not in HAZARD_ATTRS:
-            known = sorted([*HAZARD_ATTRS, CONDITION_ATTRIBUTE])
+            known = sorted([*HAZARD_ATTRS, SEISMIC_ATTRIBUTE, CONDITION_ATTRIBUTE])
             raise ValueError(f"unknown attribute {attribute!r}; available: {known}")
         if HAZARD_ATTRS[attribute].covered_col not in self._cols:
             raise ValueError(f"attribute {attribute!r} not present in this parquet")
@@ -253,7 +279,11 @@ class RecordQuery:
         return [self._require_attr(a) for a in attributes]
 
     def _columns_for(self, attribute: str) -> tuple[str, ...]:
-        return CONDITION_COLS if self._is_condition(attribute) else HAZARD_ATTRS[attribute].columns()
+        if self._is_condition(attribute):
+            return CONDITION_COLS
+        if self._is_seismic(attribute):
+            return SEISMIC_COLS
+        return HAZARD_ATTRS[attribute].columns()
 
     def _select_columns(self, attributes: list[str]) -> str:
         cols: list[str] = [c for c in _BASE_COLS if c in self._cols]
@@ -276,6 +306,8 @@ class RecordQuery:
     def _record_from_row(self, row: dict[str, Any], attribute: str) -> Record:
         if self._is_condition(attribute):
             return self._condition_record(row)
+        if self._is_seismic(attribute):
+            return self._seismic_record(row)
         return self._hazard_record(row, HAZARD_ATTRS[attribute])
 
     def _common_fields(self, row: dict[str, Any], attribute: str) -> dict[str, Any]:
@@ -325,6 +357,39 @@ class RecordQuery:
             covered=True,
             confidence_tier=ConfidenceTier.MODELLED,
             confidence=None,  # qualitative tier only; no calibrated probability invented
+            **common,
+        )
+
+    def _seismic_record(self, row: dict[str, Any]) -> Record:
+        """Earthquake record (extension B). Value = 30-yr strong-shaking probability.
+
+        J-SHIS is a probabilistic model → MODELLED tier. Uncovered (cell
+        unresolved) ⇒ covered=false, value=null — same honesty choke point.
+        """
+        covered = bool(row.get(SEISMIC_COVERED_COL))
+        observed_at = f"{int(row['dataset_year'])}-01-01T00:00:00Z"
+        confidence_label = row.get("earthquake_coverage_confidence")
+        source = Source(
+            modality=Modality.OFFICIAL_API,
+            dataset_id=row.get("earthquake_source_ids") or "jshis",
+            url="https://www.j-shis.bosai.go.jp/",
+            method=(
+                f"jshis_pshm; coverage_confidence={confidence_label}"
+                if confidence_label
+                else "jshis_pshm"
+            ),
+        )
+        common = self._common_fields(row, SEISMIC_ATTRIBUTE)
+        common.update(source=source, observed_at=observed_at)
+        if not covered:
+            return Record.unknown(**common)
+        raw = row.get("earthquake_prob_strong_shaking_30yr")
+        return Record(
+            value=float(raw) if raw is not None else None,
+            unit=None,
+            covered=True,
+            confidence_tier=ConfidenceTier.MODELLED,
+            confidence=None,  # the value IS a probability; no separate calibrated confidence
             **common,
         )
 
