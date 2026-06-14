@@ -24,6 +24,7 @@ from plateau_bridge.catalog import CityCatalog
 from plateau_bridge.config import load_settings
 from plateau_bridge.manifest import build_manifest, write_manifest
 from plateau_bridge.ops.attributes import field_coverage, normalise
+from plateau_bridge.ops.hand import apply_flood_susceptibility
 from plateau_bridge.ops.intersect import apply_coverage, apply_hazards
 from plateau_bridge.ops.seismic import apply_seismic
 from plateau_bridge.ops.uid import batch_uids
@@ -59,6 +60,7 @@ def run_gate_a(
     clip_to_admin: bool = True,
     skip_hazards: bool = False,
     seismic_provider: JshisMeshProvider | None = None,
+    flood_susceptibility: bool = False,
 ) -> GateAResult:
     settings = load_settings()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -185,6 +187,16 @@ def run_gate_a(
         notes.append(
             f"earthquake (J-SHIS {JSHIS_SOURCE_ID}): {covered:,}/{len(gdf):,} buildings covered"
         )
+
+    # 4c. DEM-derived flood susceptibility (HAND) — extension C, opt-in. A
+    # terrain reference, never an official 浸水想定. With the flag off the
+    # columns exist but stay uncovered (offline/unit builds need no DEM).
+    gdf = apply_flood_susceptibility(gdf, enabled=flood_susceptibility)
+    if flood_susceptibility:
+        fcov = int(gdf["flood_susceptibility_covered"].sum())
+        notes.append(f"flood_susceptibility (HAND): {fcov:,}/{len(gdf):,} buildings")
+    else:
+        notes.append("flood_susceptibility skipped; columns are 'unknown'")
 
     # Pre-populate Gate B / Gate C columns as nulls so the parquet schema is
     # stable from Gate A onward. Downstream gates overwrite these in place.

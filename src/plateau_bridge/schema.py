@@ -135,6 +135,23 @@ def seismic_columns() -> dict[str, pa.DataType]:
     }
 
 
+def flood_susceptibility_columns() -> dict[str, pa.DataType]:
+    """DEM-derived flood-susceptibility column group (extension C), all nullable.
+
+    A **terrain-derived reference** (HAND from GSI DEM) — NOT an official 浸水想定
+    depth. Distinct from the ``river_flood`` columns precisely so it's never
+    confused with the surveyed hazard. Same honesty rule: covered=false keeps
+    level/HAND null; "low" susceptibility is never "safe".
+    """
+    return {
+        "flood_susceptibility_covered": pa.bool_(),
+        "flood_susceptibility_level": pa.string(),     # low | medium | high
+        "flood_susceptibility_hand_m": pa.float32(),   # height above nearest drainage (m)
+        "flood_susceptibility_source_ids": pa.string(),
+        "flood_susceptibility_coverage_confidence": pa.string(),
+    }
+
+
 # Hazard kinds that report a depth value. Landslide reports a zone flag instead.
 DEPTH_HAZARDS: tuple[HazardKind, ...] = (
     HazardKind.RIVER_FLOOD,
@@ -197,6 +214,9 @@ def _build_arrow_schema() -> pa.Schema:
     # extension B — earthquake (J-SHIS 250m mesh), nationwide rather than polygon-bounded
     for name, dtype in seismic_columns().items():
         fields.append(pa.field(name, dtype))
+    # extension C — DEM-derived flood susceptibility (HAND), a terrain reference
+    for name, dtype in flood_susceptibility_columns().items():
+        fields.append(pa.field(name, dtype))
     # extension A — optional observation-state columns (all nullable)
     for name, dtype in condition_columns().items():
         fields.append(pa.field(name, dtype))
@@ -250,6 +270,33 @@ class EarthquakeField(BaseModel):
             0.0 <= self.prob_strong_shaking_30yr <= 1.0
         ):
             raise ValueError("prob_strong_shaking_30yr must be in [0, 1]")
+        return self
+
+
+class FloodSusceptibilityField(BaseModel):
+    """In-memory DEM-derived flood-susceptibility tuple (extension C, HAND).
+
+    Honesty: ``covered=false`` keeps level and HAND null. A reference estimate —
+    "low" is never "safe", and it is never an official 浸水想定 depth.
+    """
+
+    model_config = ConfigDict(use_enum_values=True)
+
+    covered: bool = False
+    level: str | None = None  # low | medium | high
+    hand_m: float | None = None
+    source_ids: list[str] = Field(default_factory=list)
+    coverage_confidence: CoverageConfidence = CoverageConfidence.UNKNOWN
+
+    @model_validator(mode="after")
+    def _honesty(self) -> FloodSusceptibilityField:
+        if not self.covered and (self.level is not None or self.hand_m is not None):
+            raise ValueError(
+                "flood_susceptibility honesty invariant: covered=false requires "
+                "level=None and hand_m=None"
+            )
+        if self.level is not None and self.level not in ("low", "medium", "high"):
+            raise ValueError("level must be low/medium/high")
         return self
 
 
@@ -310,6 +357,7 @@ class Building(BaseModel):
     attribution: str = ATTRIBUTION
     hazards: dict[HazardKind, HazardField] = Field(default_factory=dict)
     seismic: EarthquakeField | None = None  # extension B — earthquake (J-SHIS 250m mesh)
+    flood_susceptibility: FloodSusceptibilityField | None = None  # extension C — DEM HAND
     condition: ConditionField | None = None  # extension A — optional observation state
 
 

@@ -38,8 +38,9 @@ dependencies = [
 pmtiles = ["pmtiles>=3.2"]
 tiles3d = ["pygltflib>=1.16"]
 poster = ["matplotlib>=3.8"]
-all = ["pmtiles>=3.2", "pygltflib>=1.16", "matplotlib>=3.8"]
-dev = ["pytest>=8", "pytest-cov", "ruff>=0.4", "mypy>=1.10"]
+hand = ["pysheds>=0.4", "pillow>=10"]  # DEM-derived flood susceptibility (HAND)
+all = ["pmtiles>=3.2", "pygltflib>=1.16", "matplotlib>=3.8", "pysheds>=0.4", "pillow>=10"]
+dev = ["pytest>=8", "pytest-cov", "ruff>=0.4", "mypy>=1.10", "pysheds>=0.4", "pillow>=10"]
 
 [project.scripts]
 plateau = "plateau_bridge.cli:app"
