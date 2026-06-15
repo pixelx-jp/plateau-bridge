@@ -141,6 +141,12 @@ def build(
              "flood_susceptibility_* columns. A terrain reference, NOT an official "
              "浸水想定. Downloads DEM tiles at build time; requires network.",
     ),
+    landslide_susceptibility: bool = typer.Option(
+        False, "--landslide-susceptibility",
+        help="Bake DEM-derived landslide susceptibility (slope from GSI DEM) into "
+             "the landslide_susceptibility_* columns. A terrain reference, NOT an "
+             "official 土砂災害警戒区域. Downloads DEM tiles at build time; requires network.",
+    ),
     prune_cache: bool = typer.Option(
         False, "--prune-cache",
         help="After a successful build, delete this city's unzipped dataset "
@@ -181,10 +187,13 @@ def build(
             console.print("  [dim]earthquake: J-SHIS 250m mesh enabled (--seismic)[/dim]")
         if flood_susceptibility:
             console.print("  [dim]flood_susceptibility: GSI-DEM HAND enabled (--flood-susceptibility)[/dim]")
+        if landslide_susceptibility:
+            console.print("  [dim]landslide_susceptibility: GSI-DEM slope enabled (--landslide-susceptibility)[/dim]")
         a_result = run_gate_a(
             catalog, out, emit_3dtiles=not skip_3dtiles, admin_boundary=admin_arg,
             skip_hazards=no_hazards, seismic_provider=seismic_provider,
             flood_susceptibility=flood_susceptibility,
+            landslide_susceptibility=landslide_susceptibility,
         )
         console.print(f"  → {a_result.buildings_parquet}")
 

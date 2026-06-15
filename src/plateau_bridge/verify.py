@@ -175,6 +175,26 @@ def verify(out_dir: Path) -> VerifyReport:
                 )
             )
 
+    # 3e. Landslide-susceptibility honesty (extension D): covered=false MUST NOT
+    #     carry a slope value. Only checked when present (optional extension).
+    if (
+        "landslide_susceptibility_covered" in cols
+        and "landslide_susceptibility_slope_deg" in cols
+    ):
+        row = con.execute(
+            "SELECT COUNT(*) FROM b WHERE NOT landslide_susceptibility_covered "
+            "AND landslide_susceptibility_slope_deg IS NOT NULL "
+            "AND NOT isnan(landslide_susceptibility_slope_deg)"  # uncovered cells are NaN
+        ).fetchone()
+        if row and row[0] > 0:
+            findings.append(
+                Finding(
+                    "error",
+                    "honesty_violation",
+                    f"{row[0]} rows have landslide_susceptibility_slope_deg set while covered=false",
+                )
+            )
+
     # 4. Manifest cross-consistency.
     if manifest is not None:
         if manifest.n_buildings != n:

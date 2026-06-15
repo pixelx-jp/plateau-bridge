@@ -85,6 +85,12 @@ DEFAULT_PMTILES_PROPERTIES: tuple[str, ...] = (
     "flood_susceptibility_hand_m",
     "flood_susceptibility_coverage_confidence",
     "flood_susceptibility_source_ids",
+    # landslide susceptibility (DEM slope — terrain reference, extension D)
+    "landslide_susceptibility_covered",
+    "landslide_susceptibility_level",
+    "landslide_susceptibility_slope_deg",
+    "landslide_susceptibility_coverage_confidence",
+    "landslide_susceptibility_source_ids",
 )
 
 

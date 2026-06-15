@@ -27,6 +27,7 @@ from plateau_bridge.ops.attributes import field_coverage, normalise
 from plateau_bridge.ops.hand import apply_flood_susceptibility
 from plateau_bridge.ops.intersect import apply_coverage, apply_hazards
 from plateau_bridge.ops.seismic import apply_seismic
+from plateau_bridge.ops.slope import apply_landslide_susceptibility
 from plateau_bridge.ops.uid import batch_uids
 from plateau_bridge.schema import ATTRIBUTION
 from plateau_bridge.sources.citygml import convert_buildings, load_geojson
@@ -61,6 +62,7 @@ def run_gate_a(
     skip_hazards: bool = False,
     seismic_provider: JshisMeshProvider | None = None,
     flood_susceptibility: bool = False,
+    landslide_susceptibility: bool = False,
 ) -> GateAResult:
     settings = load_settings()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -197,6 +199,16 @@ def run_gate_a(
         notes.append(f"flood_susceptibility (HAND): {fcov:,}/{len(gdf):,} buildings")
     else:
         notes.append("flood_susceptibility skipped; columns are 'unknown'")
+
+    # 4d. DEM-derived landslide susceptibility (slope) — extension D, opt-in. A
+    # terrain reference, never an official 土砂災害警戒区域. With the flag off the
+    # columns exist but stay uncovered (offline/unit builds need no DEM).
+    gdf = apply_landslide_susceptibility(gdf, enabled=landslide_susceptibility)
+    if landslide_susceptibility:
+        lcov = int(gdf["landslide_susceptibility_covered"].sum())
+        notes.append(f"landslide_susceptibility (slope): {lcov:,}/{len(gdf):,} buildings")
+    else:
+        notes.append("landslide_susceptibility skipped; columns are 'unknown'")
 
     # Pre-populate Gate B / Gate C columns as nulls so the parquet schema is
     # stable from Gate A onward. Downstream gates overwrite these in place.

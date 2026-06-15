@@ -152,6 +152,24 @@ def flood_susceptibility_columns() -> dict[str, pa.DataType]:
     }
 
 
+def landslide_susceptibility_columns() -> dict[str, pa.DataType]:
+    """DEM-derived landslide-susceptibility column group (extension D), all nullable.
+
+    A **terrain-derived reference** (slope from GSI DEM) — NOT an official
+    土砂災害警戒区域 designation. Distinct from the ``landslide`` (in_zone)
+    columns precisely so it's never confused with the surveyed hazard. Same
+    honesty rule: covered=false keeps level/slope null; "low" susceptibility is
+    never "safe".
+    """
+    return {
+        "landslide_susceptibility_covered": pa.bool_(),
+        "landslide_susceptibility_level": pa.string(),       # low | medium | high
+        "landslide_susceptibility_slope_deg": pa.float32(),  # max terrain slope (degrees)
+        "landslide_susceptibility_source_ids": pa.string(),
+        "landslide_susceptibility_coverage_confidence": pa.string(),
+    }
+
+
 # Hazard kinds that report a depth value. Landslide reports a zone flag instead.
 DEPTH_HAZARDS: tuple[HazardKind, ...] = (
     HazardKind.RIVER_FLOOD,
@@ -216,6 +234,9 @@ def _build_arrow_schema() -> pa.Schema:
         fields.append(pa.field(name, dtype))
     # extension C — DEM-derived flood susceptibility (HAND), a terrain reference
     for name, dtype in flood_susceptibility_columns().items():
+        fields.append(pa.field(name, dtype))
+    # extension D — DEM-derived landslide susceptibility (slope), a terrain reference
+    for name, dtype in landslide_susceptibility_columns().items():
         fields.append(pa.field(name, dtype))
     # extension A — optional observation-state columns (all nullable)
     for name, dtype in condition_columns().items():
@@ -300,6 +321,33 @@ class FloodSusceptibilityField(BaseModel):
         return self
 
 
+class LandslideSusceptibilityField(BaseModel):
+    """In-memory DEM-derived landslide-susceptibility tuple (extension D, slope).
+
+    Honesty: ``covered=false`` keeps level and slope null. A reference estimate —
+    "low" is never "safe", and it is never an official 土砂災害警戒区域 designation.
+    """
+
+    model_config = ConfigDict(use_enum_values=True)
+
+    covered: bool = False
+    level: str | None = None  # low | medium | high
+    slope_deg: float | None = None
+    source_ids: list[str] = Field(default_factory=list)
+    coverage_confidence: CoverageConfidence = CoverageConfidence.UNKNOWN
+
+    @model_validator(mode="after")
+    def _honesty(self) -> LandslideSusceptibilityField:
+        if not self.covered and (self.level is not None or self.slope_deg is not None):
+            raise ValueError(
+                "landslide_susceptibility honesty invariant: covered=false requires "
+                "level=None and slope_deg=None"
+            )
+        if self.level is not None and self.level not in ("low", "medium", "high"):
+            raise ValueError("level must be low/medium/high")
+        return self
+
+
 class ConditionField(BaseModel):
     """In-memory observation-state tuple for one building (extension A).
 
@@ -358,6 +406,7 @@ class Building(BaseModel):
     hazards: dict[HazardKind, HazardField] = Field(default_factory=dict)
     seismic: EarthquakeField | None = None  # extension B — earthquake (J-SHIS 250m mesh)
     flood_susceptibility: FloodSusceptibilityField | None = None  # extension C — DEM HAND
+    landslide_susceptibility: LandslideSusceptibilityField | None = None  # extension D — DEM slope
     condition: ConditionField | None = None  # extension A — optional observation state
 
 
