@@ -161,6 +161,12 @@ def build(
              "PLATEAU lacked them (turns 'no data' into known official risk). "
              "Downloads hazard tiles at build time; requires network.",
     ),
+    coastal_scope: bool = typer.Option(
+        False, "--coastal-scope",
+        help="Flag 対象外 (terrain-certain non-exposure) for 津波/高潮: uncovered "
+             "buildings the hazard cannot reach (inland, or above max inundation) "
+             "→ tsunami_na/storm_surge_na. Uses GSI DEM; requires network.",
+    ),
     prune_cache: bool = typer.Option(
         False, "--prune-cache",
         help="After a successful build, delete this city's unzipped dataset "
@@ -207,6 +213,8 @@ def build(
             console.print("  [dim]inland_flood_susceptibility: GSI-DEM pluvial enabled (--inland-flood-susceptibility)[/dim]")
         if official_inundation:
             console.print("  [dim]official_inundation: GSI 浸水想定 ingest enabled (--official-inundation)[/dim]")
+        if coastal_scope:
+            console.print("  [dim]coastal_scope: 対象外 classification enabled (--coastal-scope)[/dim]")
         a_result = run_gate_a(
             catalog, out, emit_3dtiles=not skip_3dtiles, admin_boundary=admin_arg,
             skip_hazards=no_hazards, seismic_provider=seismic_provider,
@@ -214,6 +222,7 @@ def build(
             landslide_susceptibility=landslide_susceptibility,
             inland_flood_susceptibility=inland_flood_susceptibility,
             official_inundation=official_inundation,
+            coastal_scope=coastal_scope,
         )
         console.print(f"  → {a_result.buildings_parquet}")
 

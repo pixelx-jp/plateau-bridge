@@ -97,6 +97,9 @@ DEFAULT_PMTILES_PROPERTIES: tuple[str, ...] = (
     "inland_flood_susceptibility_pond_m",
     "inland_flood_susceptibility_coverage_confidence",
     "inland_flood_susceptibility_source_ids",
+    # 対象外 (terrain-certain non-exposure) flags for coastal hazards (extension G)
+    "tsunami_na",
+    "storm_surge_na",
 )
 
 

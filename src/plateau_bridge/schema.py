@@ -170,6 +170,20 @@ def landslide_susceptibility_columns() -> dict[str, pa.DataType]:
     }
 
 
+def coastal_scope_columns() -> dict[str, pa.DataType]:
+    """対象外 (terrain-certain non-exposure) flags for coastal hazards (extension G).
+
+    ``<kind>_na`` = the building is, by terrain, outside any credible 津波/高潮
+    inundation (inland ward with no designated area, or above the max modelled
+    depth). A deterministic exclusion, not a risk value. Never True where the
+    official ``<kind>_covered`` is True.
+    """
+    return {
+        "tsunami_na": pa.bool_(),
+        "storm_surge_na": pa.bool_(),
+    }
+
+
 def inland_flood_susceptibility_columns() -> dict[str, pa.DataType]:
     """DEM-derived inland (pluvial) flood-susceptibility column group (extension E).
 
@@ -259,6 +273,9 @@ def _build_arrow_schema() -> pa.Schema:
         fields.append(pa.field(name, dtype))
     # extension E — DEM-derived inland (pluvial) flood susceptibility, a terrain reference
     for name, dtype in inland_flood_susceptibility_columns().items():
+        fields.append(pa.field(name, dtype))
+    # extension G — 対象外 (terrain-certain non-exposure) flags for coastal hazards
+    for name, dtype in coastal_scope_columns().items():
         fields.append(pa.field(name, dtype))
     # extension A — optional observation-state columns (all nullable)
     for name, dtype in condition_columns().items():

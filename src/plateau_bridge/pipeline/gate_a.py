@@ -24,6 +24,7 @@ from plateau_bridge.catalog import CityCatalog
 from plateau_bridge.config import load_settings
 from plateau_bridge.manifest import build_manifest, write_manifest
 from plateau_bridge.ops.attributes import field_coverage, normalise
+from plateau_bridge.ops.coastal_scope import apply_coastal_scope
 from plateau_bridge.ops.hand import apply_flood_susceptibility
 from plateau_bridge.ops.intersect import apply_coverage, apply_hazards
 from plateau_bridge.ops.official_inundation import apply_official_inundation
@@ -67,6 +68,7 @@ def run_gate_a(
     landslide_susceptibility: bool = False,
     inland_flood_susceptibility: bool = False,
     official_inundation: bool = False,
+    coastal_scope: bool = False,
 ) -> GateAResult:
     settings = load_settings()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -235,6 +237,15 @@ def run_gate_a(
             notes.append(f"official_inundation {kind} (GSI 浸水想定): +{after - before:,} buildings")
     else:
         notes.append("official_inundation skipped (--official-inundation off)")
+
+    # 4g. 対象外 (terrain-certain non-exposure) for coastal hazards — opt-in. Marks
+    # uncovered buildings the hazard cannot reach (inland / above max inundation).
+    if coastal_scope:
+        for kind in ("tsunami", "storm_surge"):
+            gdf = apply_coastal_scope(gdf, kind, enabled=True)
+            notes.append(f"coastal_scope {kind}: 対象外 {int(gdf[f'{kind}_na'].sum()):,}/{len(gdf):,}")
+    else:
+        notes.append("coastal_scope skipped (--coastal-scope off)")
 
     # Pre-populate Gate B / Gate C columns as nulls so the parquet schema is
     # stable from Gate A onward. Downstream gates overwrite these in place.
