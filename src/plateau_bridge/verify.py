@@ -195,6 +195,26 @@ def verify(out_dir: Path) -> VerifyReport:
                 )
             )
 
+    # 3f. Inland (pluvial) flood-susceptibility honesty (extension E): covered=false
+    #     MUST NOT carry a ponding depth. Only checked when present.
+    if (
+        "inland_flood_susceptibility_covered" in cols
+        and "inland_flood_susceptibility_pond_m" in cols
+    ):
+        row = con.execute(
+            "SELECT COUNT(*) FROM b WHERE NOT inland_flood_susceptibility_covered "
+            "AND inland_flood_susceptibility_pond_m IS NOT NULL "
+            "AND NOT isnan(inland_flood_susceptibility_pond_m)"
+        ).fetchone()
+        if row and row[0] > 0:
+            findings.append(
+                Finding(
+                    "error",
+                    "honesty_violation",
+                    f"{row[0]} rows have inland_flood_susceptibility_pond_m set while covered=false",
+                )
+            )
+
     # 4. Manifest cross-consistency.
     if manifest is not None:
         if manifest.n_buildings != n:

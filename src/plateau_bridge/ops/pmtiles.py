@@ -91,6 +91,12 @@ DEFAULT_PMTILES_PROPERTIES: tuple[str, ...] = (
     "landslide_susceptibility_slope_deg",
     "landslide_susceptibility_coverage_confidence",
     "landslide_susceptibility_source_ids",
+    # inland (pluvial) flood susceptibility (DEM depression fill-spill, extension E)
+    "inland_flood_susceptibility_covered",
+    "inland_flood_susceptibility_level",
+    "inland_flood_susceptibility_pond_m",
+    "inland_flood_susceptibility_coverage_confidence",
+    "inland_flood_susceptibility_source_ids",
 )
 
 

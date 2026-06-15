@@ -26,6 +26,7 @@ from plateau_bridge.manifest import build_manifest, write_manifest
 from plateau_bridge.ops.attributes import field_coverage, normalise
 from plateau_bridge.ops.hand import apply_flood_susceptibility
 from plateau_bridge.ops.intersect import apply_coverage, apply_hazards
+from plateau_bridge.ops.pluvial_tci import apply_inland_flood_susceptibility
 from plateau_bridge.ops.seismic import apply_seismic
 from plateau_bridge.ops.slope import apply_landslide_susceptibility
 from plateau_bridge.ops.uid import batch_uids
@@ -63,6 +64,7 @@ def run_gate_a(
     seismic_provider: JshisMeshProvider | None = None,
     flood_susceptibility: bool = False,
     landslide_susceptibility: bool = False,
+    inland_flood_susceptibility: bool = False,
 ) -> GateAResult:
     settings = load_settings()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -209,6 +211,15 @@ def run_gate_a(
         notes.append(f"landslide_susceptibility (slope): {lcov:,}/{len(gdf):,} buildings")
     else:
         notes.append("landslide_susceptibility skipped; columns are 'unknown'")
+
+    # 4e. DEM-derived inland (pluvial) flood susceptibility — extension E, opt-in. A
+    # terrain reference, never an official 内水浸水想定. Off → columns exist but uncovered.
+    gdf = apply_inland_flood_susceptibility(gdf, enabled=inland_flood_susceptibility)
+    if inland_flood_susceptibility:
+        icov = int(gdf["inland_flood_susceptibility_covered"].sum())
+        notes.append(f"inland_flood_susceptibility (pluvial): {icov:,}/{len(gdf):,} buildings")
+    else:
+        notes.append("inland_flood_susceptibility skipped; columns are 'unknown'")
 
     # Pre-populate Gate B / Gate C columns as nulls so the parquet schema is
     # stable from Gate A onward. Downstream gates overwrite these in place.

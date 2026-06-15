@@ -170,6 +170,25 @@ def landslide_susceptibility_columns() -> dict[str, pa.DataType]:
     }
 
 
+def inland_flood_susceptibility_columns() -> dict[str, pa.DataType]:
+    """DEM-derived inland (pluvial) flood-susceptibility column group (extension E).
+
+    A **terrain-derived reference** (depression fill-and-spill from GSI DEM) — NOT
+    an official 内水/雨水出水浸水想定. Distinct from ``river_flood`` (fluvial) and
+    from ``flood_susceptibility`` (HAND, also fluvial): this is rainfall-driven
+    ponding in local depressions. Honesty: covered=false ⇒ level/pond/tci null;
+    "low" (well-drained) is never "safe"; ignores the storm-sewer network.
+    """
+    return {
+        "inland_flood_susceptibility_covered": pa.bool_(),
+        "inland_flood_susceptibility_level": pa.string(),     # low | medium | high
+        "inland_flood_susceptibility_pond_m": pa.float32(),   # potential ponding depth (m)
+        "inland_flood_susceptibility_tci": pa.float32(),      # depression TCI ln(A·√S/V), relative
+        "inland_flood_susceptibility_source_ids": pa.string(),
+        "inland_flood_susceptibility_coverage_confidence": pa.string(),
+    }
+
+
 # Hazard kinds that report a depth value. Landslide reports a zone flag instead.
 DEPTH_HAZARDS: tuple[HazardKind, ...] = (
     HazardKind.RIVER_FLOOD,
@@ -237,6 +256,9 @@ def _build_arrow_schema() -> pa.Schema:
         fields.append(pa.field(name, dtype))
     # extension D — DEM-derived landslide susceptibility (slope), a terrain reference
     for name, dtype in landslide_susceptibility_columns().items():
+        fields.append(pa.field(name, dtype))
+    # extension E — DEM-derived inland (pluvial) flood susceptibility, a terrain reference
+    for name, dtype in inland_flood_susceptibility_columns().items():
         fields.append(pa.field(name, dtype))
     # extension A — optional observation-state columns (all nullable)
     for name, dtype in condition_columns().items():
@@ -348,6 +370,35 @@ class LandslideSusceptibilityField(BaseModel):
         return self
 
 
+class InlandFloodSusceptibilityField(BaseModel):
+    """In-memory DEM-derived inland (pluvial) flood-susceptibility tuple (extension E).
+
+    Honesty: ``covered=false`` keeps level/pond/tci null. A reference estimate —
+    "low" is never "safe", it is never an official 内水浸水想定, and it ignores the
+    storm-sewer drainage network.
+    """
+
+    model_config = ConfigDict(use_enum_values=True)
+
+    covered: bool = False
+    level: str | None = None  # low | medium | high
+    pond_m: float | None = None
+    tci: float | None = None
+    source_ids: list[str] = Field(default_factory=list)
+    coverage_confidence: CoverageConfidence = CoverageConfidence.UNKNOWN
+
+    @model_validator(mode="after")
+    def _honesty(self) -> InlandFloodSusceptibilityField:
+        if not self.covered and (self.level is not None or self.pond_m is not None):
+            raise ValueError(
+                "inland_flood_susceptibility honesty invariant: covered=false requires "
+                "level=None and pond_m=None"
+            )
+        if self.level is not None and self.level not in ("low", "medium", "high"):
+            raise ValueError("level must be low/medium/high")
+        return self
+
+
 class ConditionField(BaseModel):
     """In-memory observation-state tuple for one building (extension A).
 
@@ -407,6 +458,7 @@ class Building(BaseModel):
     seismic: EarthquakeField | None = None  # extension B — earthquake (J-SHIS 250m mesh)
     flood_susceptibility: FloodSusceptibilityField | None = None  # extension C — DEM HAND
     landslide_susceptibility: LandslideSusceptibilityField | None = None  # extension D — DEM slope
+    inland_flood_susceptibility: InlandFloodSusceptibilityField | None = None  # extension E — DEM pluvial
     condition: ConditionField | None = None  # extension A — optional observation state
 
 
