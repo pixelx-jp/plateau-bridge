@@ -26,6 +26,7 @@ from plateau_bridge.manifest import build_manifest, write_manifest
 from plateau_bridge.ops.attributes import field_coverage, normalise
 from plateau_bridge.ops.hand import apply_flood_susceptibility
 from plateau_bridge.ops.intersect import apply_coverage, apply_hazards
+from plateau_bridge.ops.official_inundation import apply_official_inundation
 from plateau_bridge.ops.pluvial_tci import apply_inland_flood_susceptibility
 from plateau_bridge.ops.seismic import apply_seismic
 from plateau_bridge.ops.slope import apply_landslide_susceptibility
@@ -65,6 +66,7 @@ def run_gate_a(
     flood_susceptibility: bool = False,
     landslide_susceptibility: bool = False,
     inland_flood_susceptibility: bool = False,
+    official_inundation: bool = False,
 ) -> GateAResult:
     settings = load_settings()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -220,6 +222,19 @@ def run_gate_a(
         notes.append(f"inland_flood_susceptibility (pluvial): {icov:,}/{len(gdf):,} buildings")
     else:
         notes.append("inland_flood_susceptibility skipped; columns are 'unknown'")
+
+    # 4f. Official 浸水想定 ingest from GSI raster tiles — opt-in. Overlays the
+    # OFFICIAL <kind>_covered/depth columns where PLATEAU lacked them (notably
+    # 津波/高潮), turning "no data" into known official risk. Never clobbers PLATEAU.
+    if official_inundation:
+        for kind in ("river_flood", "tsunami", "storm_surge", "inland_flood"):
+            before = int(gdf[f"{kind}_covered"].fillna(False).astype(bool).sum()) \
+                if f"{kind}_covered" in gdf.columns else 0
+            gdf = apply_official_inundation(gdf, kind, enabled=True)
+            after = int(gdf[f"{kind}_covered"].fillna(False).astype(bool).sum())
+            notes.append(f"official_inundation {kind} (GSI 浸水想定): +{after - before:,} buildings")
+    else:
+        notes.append("official_inundation skipped (--official-inundation off)")
 
     # Pre-populate Gate B / Gate C columns as nulls so the parquet schema is
     # stable from Gate A onward. Downstream gates overwrite these in place.

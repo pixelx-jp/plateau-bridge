@@ -154,6 +154,13 @@ def build(
              "columns. A terrain reference, NOT an official 内水浸水想定. Downloads DEM "
              "tiles at build time; requires network.",
     ),
+    official_inundation: bool = typer.Option(
+        False, "--official-inundation",
+        help="Ingest OFFICIAL 浸水想定 from GSI 重ねるハザードマップ raster tiles into the "
+             "river_flood/tsunami/storm_surge/inland_flood official columns where "
+             "PLATEAU lacked them (turns 'no data' into known official risk). "
+             "Downloads hazard tiles at build time; requires network.",
+    ),
     prune_cache: bool = typer.Option(
         False, "--prune-cache",
         help="After a successful build, delete this city's unzipped dataset "
@@ -198,12 +205,15 @@ def build(
             console.print("  [dim]landslide_susceptibility: GSI-DEM slope enabled (--landslide-susceptibility)[/dim]")
         if inland_flood_susceptibility:
             console.print("  [dim]inland_flood_susceptibility: GSI-DEM pluvial enabled (--inland-flood-susceptibility)[/dim]")
+        if official_inundation:
+            console.print("  [dim]official_inundation: GSI 浸水想定 ingest enabled (--official-inundation)[/dim]")
         a_result = run_gate_a(
             catalog, out, emit_3dtiles=not skip_3dtiles, admin_boundary=admin_arg,
             skip_hazards=no_hazards, seismic_provider=seismic_provider,
             flood_susceptibility=flood_susceptibility,
             landslide_susceptibility=landslide_susceptibility,
             inland_flood_susceptibility=inland_flood_susceptibility,
+            official_inundation=official_inundation,
         )
         console.print(f"  → {a_result.buildings_parquet}")
 
