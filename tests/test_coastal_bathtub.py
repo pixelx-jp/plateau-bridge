@@ -18,16 +18,21 @@ from plateau_bridge.schema import BUILDINGS_ARROW_SCHEMA
 
 
 def _dem_png(elev: np.ndarray) -> bytes:
-    x = np.round(elev / 0.01).astype(np.int64) % 16777216
+    """Encode elevation; NaN → GSI nodata sentinel RGB(128,0,0) (= ocean)."""
+    nan = ~np.isfinite(elev)
+    x = np.round(np.nan_to_num(elev) / 0.01).astype(np.int64) % 16777216
     rgb = np.dstack([(x >> 16) & 255, (x >> 8) & 255, x & 255]).astype(np.uint8)
+    rgb[nan] = (128, 0, 0)  # GSI no-data = ocean
     buf = io.BytesIO()
     Image.fromarray(rgb, "RGB").save(buf, format="PNG")
     return buf.getvalue()
 
 
-# A coast: left columns are sea (≤0), rising inland to the right. A disconnected
-# inland pit (deep) must NOT flood (connectivity test).
-_COAST = np.tile(np.linspace(-2.0, 12.0, 256, dtype=np.float32), (256, 1))
+# A coast: leftmost columns are SEA (nodata), rising inland to the right (land,
+# incl. a real ≤0 m strip near the coast that must stay LAND/flood-receiving).
+# A disconnected inland pit (deep) must NOT flood (connectivity test).
+_COAST = np.tile(np.linspace(-1.0, 12.0, 256, dtype=np.float32), (256, 1))
+_COAST[:, :20] = np.nan          # ocean (nodata) on the left border
 _COAST[120:130, 200:210] = -5.0  # inland pit below sea level but NOT coast-connected
 _COAST_PNG = _dem_png(_COAST)
 
@@ -40,18 +45,44 @@ def test_bathtub_level_thresholds():
 
 
 def test_compute_bathtub_floods_connected_low_not_disconnected_pit():
-    depth = compute_bathtub(_COAST.copy(), seed_m=3.0)
-    # somewhere near the coast (low, connected) floods
+    depth = compute_bathtub(_COAST.copy(), seed_m=3.0, px_real=10.0)
+    # coast-connected low land floods
     assert np.isfinite(depth).any()
     assert float(np.nanmax(depth)) > 0
     # the disconnected inland pit must stay dry (NaN) — connectivity, not naive bathtub
     assert not np.isfinite(depth[124, 205])
 
 
+def test_compute_bathtub_zero_m_land_is_flood_receiving_not_sea():
+    # a real ≤0 m coast strip (NOT nodata) must be treated as LAND that floods,
+    # never as sea/source (the P0 fix). Column 25 is land at ≈ -0.7 m, coast-adjacent.
+    depth = compute_bathtub(_COAST.copy(), seed_m=3.0, px_real=10.0)
+    assert np.isfinite(depth[128, 25])          # 0m-zone land IS flagged (flooded)
+    assert float(depth[128, 25]) > 0
+
+
+def test_compute_bathtub_attenuation_decreases_inland():
+    # flat low plain behind a nodata-sea border → depth must DECREASE with distance.
+    flat = np.zeros((64, 400), dtype=np.float32)
+    flat[:, :10] = np.nan  # sea
+    d = compute_bathtub(flat, seed_m=5.0, px_real=50.0, attenuation=0.0002)
+    near = float(d[32, 20])
+    far = float(d[32, 380])
+    assert np.isfinite(near) and near > far  # attenuated inland
+
+
 def test_compute_bathtub_no_sea_no_flood():
-    # all-high terrain, no sea, no border-connected ≤0 → nothing floods
+    # all-high terrain, NO nodata → no ocean seed → nothing floods
     hi = np.full((128, 128), 30.0, dtype=np.float32)
-    depth = compute_bathtub(hi, seed_m=5.0)
+    depth = compute_bathtub(hi, seed_m=5.0, px_real=10.0)
+    assert not np.isfinite(depth).any()
+
+
+def test_compute_bathtub_low_land_no_nodata_no_flood():
+    # a basin of real ≤0 m land with NO nodata anywhere → no sea → must NOT flood
+    # (proves we don't treat ≤0 m as sea, and don't flood without an ocean seed).
+    low = np.full((64, 64), -2.0, dtype=np.float32)
+    depth = compute_bathtub(low, seed_m=5.0, px_real=10.0)
     assert not np.isfinite(depth).any()
 
 

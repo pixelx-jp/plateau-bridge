@@ -6,15 +6,20 @@ it does NOT supersede the official 想定 (the API/map only apply it where offic
 coverage is absent). It answers: "if the sea rose to the prefecture's maximum
 modelled 想定 height, which sea-connected low ground would it reach?".
 
-It is an *enhanced* bathtub, not the naive one: only cells **8-connected to the
-sea** below the seed height flood, so disconnected inland depressions are NOT
-flagged (the classic bathtub over-prediction error, cf. Flow-Tub / Williams &
-Lück-Vogel 2020). The seed height is the caller-supplied per-prefecture maximum
-想定 (津波/高潮) — a real official figure used as a conservative terrain what-if.
+It is an *enhanced* bathtub, not the naive one: (1) only cells **8-connected to
+the sea** flood (disconnected inland depressions are NOT flagged — the classic
+bathtub over-prediction error, cf. Flow-Tub, Kasmalkar 2023); (2) the water level
+**attenuates inland** ~20 cm/km with euclidean distance from the coast (Vafeidis
+2019 NHESS 19:973; ignoring it ~doubles exposed area). The seed is the caller-
+supplied **water-surface height (T.P.)** = the prefecture's max 想定 津波高/基準水位
+— NOT 浸水深 (ground-relative depth): the bathtub compares water-surface elevation
+to DEM ground elevation, both T.P.
 
-Caveats (must be labelled): static fill — no flow dynamics, timing, or
-attenuation, so it OVER-estimates inland reach near the seed height; "low"
-susceptibility is never "safe". ``fetch`` is injectable so tests run offline.
+Honesty/limits (must be labelled): static fill, no flow dynamics/timing; the
+euclidean attenuation is an APPROXIMATION of true hydraulic path distance
+(conservative, not a travel-distance claim); "low" is never "safe". Sea = GSI
+**nodata only** (ocean is encoded nodata; real ≤0 m is land — ゼロメートル地帯 —
+that must stay flood-RECEIVING, not flood-source). ``fetch`` is injectable.
 """
 
 from __future__ import annotations
@@ -27,9 +32,12 @@ from plateau_bridge.ops.hand import Fetch, _default_fetch, fetch_dem_mosaic, lon
 
 log = logging.getLogger(__name__)
 
-# Inundation depth (m, seed − ground) → relative susceptibility band.
+# Inundation depth (m, attenuated water level − ground) → relative susceptibility band.
 BATHTUB_HIGH_M = 3.0
 BATHTUB_MED_M = 0.5
+# Inland attenuation of the water level. ~20 cm/km is the Flow-Tub default
+# (Kasmalkar 2023 MethodsX 12:102524; Vafeidis 2019 NHESS 19:973, range 5–100).
+ATTENUATION_M_PER_M = 0.0002
 
 
 def bathtub_level(depth_m: float) -> str:
@@ -40,13 +48,19 @@ def bathtub_level(depth_m: float) -> str:
     return "low"
 
 
-def compute_bathtub(elev: np.ndarray, seed_m: float) -> np.ndarray:
-    """Connectivity bathtub inundation depth (m) for each cell; NaN where dry.
+def compute_bathtub(
+    elev: np.ndarray, seed_m: float, *, px_real: float = 10.0,
+    attenuation: float = ATTENUATION_M_PER_M,
+) -> np.ndarray:
+    """Connectivity + attenuation bathtub inundation depth (m); NaN where dry.
 
-    Sea = nodata(NaN) or elev ≤ 0 cells connected to the grid border. A land cell
-    floods iff elev < ``seed_m`` AND it is 8-connected (through other floodable /
-    sea cells) to the sea. Depth = seed_m − elev. Disconnected inland low ground
-    stays dry (NaN).
+    Sea = **nodata only**, connected to the grid border (GSI encodes ocean as
+    nodata; real ≤0 m is land). Local water level decays inland with euclidean
+    distance to the sea: ``level = seed_m − attenuation·(dist_px·px_real)`` (an
+    APPROXIMATION of hydraulic path distance — conservative, not a travel claim).
+    A land cell floods iff ``elev < level`` AND it is 8-connected (through
+    floodable/sea cells) to the sea. Depth = level − elev; disconnected inland
+    low ground stays dry (NaN).
     """
     from scipy import ndimage
 
@@ -54,21 +68,24 @@ def compute_bathtub(elev: np.ndarray, seed_m: float) -> np.ndarray:
         return np.full(elev.shape, np.nan, dtype=np.float32)
 
     nodata = ~np.isfinite(elev)
-    sea_like = nodata | (elev <= 0.0)
-    # keep only sea-like components touching the border (true ocean / tidal rivers),
-    # not interior nodata holes.
-    lab, n = ndimage.label(sea_like)
+    # GSI ocean = nodata; do NOT treat ≤0 m land as sea. Keep only border-connected
+    # nodata as sea (interior nodata holes / mid-grid fetch gaps are not ocean).
+    lab, n = ndimage.label(nodata)
     if n == 0:
-        return np.full(elev.shape, np.nan, dtype=np.float32)
+        return np.full(elev.shape, np.nan, dtype=np.float32)  # full DEM, no ocean → no flood
     border = set(lab[0, :]) | set(lab[-1, :]) | set(lab[:, 0]) | set(lab[:, -1])
     border.discard(0)
     if not border:
-        return np.full(elev.shape, np.nan, dtype=np.float32)  # no coast in view → no flood
+        return np.full(elev.shape, np.nan, dtype=np.float32)
     sea = np.isin(lab, list(border))
 
-    # floodable region = sea ∪ land below seed; keep components that contain sea.
-    region = sea | ((~nodata) & (elev < seed_m))
-    rlab, rn = ndimage.label(region, structure=np.ones((3, 3)))  # 8-connectivity
+    # attenuated water level: seed minus decay over euclidean distance to the sea.
+    dist_px = ndimage.distance_transform_edt(~sea)
+    level = (seed_m - attenuation * (dist_px * px_real)).astype(np.float32)
+
+    # floodable land = below its local level; keep components 8-connected to the sea.
+    region = sea | ((~nodata) & (elev < level) & (level > 0))
+    rlab, rn = ndimage.label(region, structure=np.ones((3, 3)))
     if rn == 0:
         return np.full(elev.shape, np.nan, dtype=np.float32)
     sea_labels = set(np.unique(rlab[sea]))
@@ -76,7 +93,7 @@ def compute_bathtub(elev: np.ndarray, seed_m: float) -> np.ndarray:
     flooded = np.isin(rlab, list(sea_labels)) & (~sea) & (~nodata)
 
     depth = np.full(elev.shape, np.nan, dtype=np.float32)
-    depth[flooded] = (seed_m - elev[flooded]).astype(np.float32)
+    depth[flooded] = (level[flooded] - elev[flooded]).astype(np.float32)
     depth[depth <= 0] = np.nan
     return depth
 
@@ -88,16 +105,25 @@ def apply_coastal_bathtub(
     seed_m: float,
     enabled: bool = False,
     zoom: int = 14,
+    coast_buffer_deg: float = 0.04,
     fetch: Fetch = _default_fetch,
     source_id: str = "gsi-dem-bathtub",
 ):
-    """Add ``<kind>_susceptibility_*`` columns from a connectivity bathtub.
+    """Add ``<kind>_susceptibility_*`` columns from a connectivity+attenuation bathtub.
 
     ``kind`` ∈ {tsunami, storm_surge}; ``seed_m`` = the prefecture's max 想定
-    height (caller-supplied). Opt-in. Honesty: covered=false ⇒ level/depth null;
-    only sea-connected low ground floods; a future caller should apply this ONLY
-    where the official ``<kind>_covered`` is absent (it never supersedes 想定).
+    **water-surface height (T.P.)** (caller-supplied). Opt-in. Honesty: covered=false
+    ⇒ level/depth null; only sea-connected low ground floods; apply ONLY where the
+    official ``<kind>_covered`` is absent (it never supersedes 想定).
+
+    ``coast_buffer_deg`` expands the DEM fetch bbox beyond the building footprint so
+    a waterfront ward's adjacent **bay/ocean nodata** is in view to seed the flood-
+    fill — without it a coastal ward whose bbox excludes the bay would get NO sea
+    seed and (correctly per nodata-only sea) flood nothing, silently erasing the
+    0 m zone. ~0.04° ≈ 4 km.
     """
+    import math
+
     import geopandas as gpd
 
     out: gpd.GeoDataFrame = buildings.copy()
@@ -110,12 +136,14 @@ def apply_coastal_bathtub(
     if not enabled or n == 0 or seed_m <= 0:
         return out
 
-    minlon = float(out["centroid_lon"].min())
-    maxlon = float(out["centroid_lon"].max())
-    minlat = float(out["centroid_lat"].min())
-    maxlat = float(out["centroid_lat"].max())
+    b = coast_buffer_deg
+    minlon = float(out["centroid_lon"].min()) - b
+    maxlon = float(out["centroid_lon"].max()) + b
+    minlat = float(out["centroid_lat"].min()) - b
+    maxlat = float(out["centroid_lat"].max()) + b
     elev, x0, y0, px = fetch_dem_mosaic((minlon, minlat, maxlon, maxlat), zoom, fetch=fetch)
-    depth_grid = compute_bathtub(elev, seed_m)
+    px_real = px * math.cos(math.radians((minlat + maxlat) / 2))
+    depth_grid = compute_bathtub(elev, seed_m, px_real=px_real)
     H, W = depth_grid.shape
 
     levels: list[str | None] = []
