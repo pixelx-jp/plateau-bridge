@@ -170,6 +170,23 @@ def landslide_susceptibility_columns() -> dict[str, pa.DataType]:
     }
 
 
+def coastal_bathtub_columns() -> dict[str, pa.DataType]:
+    """Connectivity-bathtub terrain-susceptibility columns for 津波/高潮 (extension H).
+
+    A **terrain-derived reference** (sea-connected static fill to the prefecture's
+    max 想定 height) — NOT an official projection; applied only where official
+    coverage is absent. Honesty: covered=false ⇒ level/depth null; "low" ≠ safe.
+    """
+    cols: dict[str, pa.DataType] = {}
+    for kind in ("tsunami", "storm_surge"):
+        cols[f"{kind}_susceptibility_covered"] = pa.bool_()
+        cols[f"{kind}_susceptibility_level"] = pa.string()      # low | medium | high
+        cols[f"{kind}_susceptibility_depth_m"] = pa.float32()   # seed − ground (m)
+        cols[f"{kind}_susceptibility_source_ids"] = pa.string()
+        cols[f"{kind}_susceptibility_coverage_confidence"] = pa.string()
+    return cols
+
+
 def coastal_scope_columns() -> dict[str, pa.DataType]:
     """対象外 (terrain-certain non-exposure) flags for coastal hazards (extension G).
 
@@ -276,6 +293,9 @@ def _build_arrow_schema() -> pa.Schema:
         fields.append(pa.field(name, dtype))
     # extension G — 対象外 (terrain-certain non-exposure) flags for coastal hazards
     for name, dtype in coastal_scope_columns().items():
+        fields.append(pa.field(name, dtype))
+    # extension H — connectivity-bathtub terrain susceptibility for 津波/高潮
+    for name, dtype in coastal_bathtub_columns().items():
         fields.append(pa.field(name, dtype))
     # extension A — optional observation-state columns (all nullable)
     for name, dtype in condition_columns().items():

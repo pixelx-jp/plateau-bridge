@@ -100,6 +100,13 @@ DEFAULT_PMTILES_PROPERTIES: tuple[str, ...] = (
     # 対象外 (terrain-certain non-exposure) flags for coastal hazards (extension G)
     "tsunami_na",
     "storm_surge_na",
+    # connectivity-bathtub terrain susceptibility for 津波/高潮 (extension H)
+    "tsunami_susceptibility_covered",
+    "tsunami_susceptibility_level",
+    "tsunami_susceptibility_depth_m",
+    "storm_surge_susceptibility_covered",
+    "storm_surge_susceptibility_level",
+    "storm_surge_susceptibility_depth_m",
 )
 
 
