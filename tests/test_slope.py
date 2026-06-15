@@ -43,12 +43,28 @@ _FLAT_PNG = _dem_png(_FLAT)
 
 
 def test_slope_level_thresholds():
+    # aligned to legal 急傾斜地 30°; relief defaults to ∞ (ungated) here
     assert slope_level(0.0) == "low"
-    assert slope_level(4.9) == "low"
-    assert slope_level(5.0) == "medium"
-    assert slope_level(14.9) == "medium"
-    assert slope_level(15.0) == "high"
+    assert slope_level(24.9) == "low"
+    assert slope_level(25.0) == "medium"
+    assert slope_level(29.9) == "medium"
+    assert slope_level(30.0) == "high"
     assert slope_level(45.0) == "high"
+
+
+def test_slope_level_relief_gate():
+    # legal criterion is slope AND height ≥5 m → low relief demotes to low
+    assert slope_level(40.0, relief_m=3.0) == "low"   # steep but <5 m scarp → noise/bump
+    assert slope_level(40.0, relief_m=8.0) == "high"  # real scarp
+    assert slope_level(27.0, relief_m=8.0) == "medium"
+
+
+def test_compute_relief_m():
+    from plateau_bridge.ops.slope import compute_relief_m
+    flat = np.full((32, 32), 5.0, dtype=np.float32)
+    assert float(np.nanmax(compute_relief_m(flat))) < 0.01
+    ramp = np.tile(np.linspace(0, 100, 32, dtype=np.float32), (32, 1))
+    assert float(np.nanmax(compute_relief_m(ramp))) > 5.0
 
 
 def test_compute_slope_flat_is_zero():

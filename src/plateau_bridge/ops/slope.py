@@ -1,30 +1,28 @@
-"""DEM-derived landslide susceptibility via terrain slope.
+"""DEM-derived **steep-slope (急傾斜地) susceptibility** via terrain slope.
 
 A **deterministic, terrain-derived reference** layer — NOT an official
-土砂災害警戒区域 designation. It answers "how steep is the ground at this
-building", the dominant physical precondition for sediment disasters
-(急傾斜地の崩壊 / 土石流 / 地すべり). It must be presented as a clearly-labelled
-*susceptibility estimate*, never as an official hazard-zone designation, and
-"low susceptibility" never means safe.
+土砂災害警戒区域 designation. It proxies the dominant precondition of the
+**急傾斜地の崩壊** (steep-slope collapse) mechanism only. It deliberately does
+NOT capture the other two legal sediment mechanisms — **土石流** (debris flow,
+which occurs on near-flat valley floors / fan apexes, 河床勾配 ≥ ~2°, and reads
+"low" by slope) and **地すべり** (landslide, on gentle 5–20° slopes, driven by
+geology/groundwater). For those, the official A33 / PLATEAU 土砂災害警戒区域 layer
+(our "confirmed" layer) is authoritative. Present this as a clearly-labelled
+*steep-slope susceptibility estimate*; "low" never means safe.
 
 Pipeline (per city bbox):
-  GSI dem_png tiles (Web-Mercator, decoded to metres) → mosaic raster
-  → per-cell maximum slope angle (gradient on the metric grid)
-  → sample at building centroids → bin to low/medium/high.
+  GSI dem_png tiles (Web-Mercator → metres) → mosaic → per-cell max slope angle
+  (Horn-style central-difference gradient on the metric grid) + local relief
+  (max−min over a ~50 m window) → sample at building centroids → low/med/high.
 
-Slope is a *local* relief signal (unlike HAND, which is a basin-scale flow
-computation), so this samples a finer DEM zoom by default and needs no flow
-routing — just a numpy gradient. The level thresholds (≥15° high, ≥5° medium)
-are the SAME as the runtime slope estimate in plateau-bosai's API
-(gsi/slope.py). Note the *inputs* to those thresholds differ: this bake takes a
-~9.5 m DEM gradient while the runtime uses a 50 m finite-difference baseline, so
-on steep micro-relief the two terrain-derived estimates may land on different
-levels. Both are clearly-labelled "参考推算（非公式）", so a divergence between two
-reference estimates is acceptable — neither is presented as authoritative.
+Calibration to the legal 急傾斜地 criterion (傾斜度 **30°以上 かつ 高さ5m以上**): a
+building reads medium/high only when BOTH the slope ≥ threshold (≥25° medium,
+≥30° high) AND the local relief ≥ 5 m (a real scarp, not a long gentle grade or
+a sub-metre bump). This is computed at ~10 m DEM resolution (GSI DEM10B native),
+unifying the map and the API report on one window/threshold.
 
-The mosaic stays in EPSG:3857 (the tile grid); the ~cos(lat) mercator scale
-distortion is corrected to ground metres before the gradient. ``fetch`` is
-injectable so tests run offline.
+The mosaic stays in EPSG:3857; the ~cos(lat) mercator scale is corrected to
+ground metres before the gradient. ``fetch`` is injectable so tests run offline.
 """
 
 from __future__ import annotations
@@ -40,15 +38,24 @@ from plateau_bridge.ops.hand import Fetch, _default_fetch, fetch_dem_mosaic, lon
 
 log = logging.getLogger(__name__)
 
-# Maximum slope angle (degrees) → relative landslide susceptibility. The level
-# thresholds are identical to plateau-bosai services/api/src/gsi/slope.py; the
-# slope *value* fed in differs by DEM baseline (see module docstring), so the
-# map and report can disagree on level. Screening-grade, not an engineering judgement.
-SLOPE_HIGH_DEG = 15.0
-SLOPE_MED_DEG = 5.0
+# Slope thresholds aligned to the legal 急傾斜地 line (30°); medium = approaching it.
+SLOPE_HIGH_DEG = 30.0
+SLOPE_MED_DEG = 25.0
+# Minimum local relief (scarp height, m) for a medium/high call — the legal
+# criterion is slope AND height ≥ 5 m, so a flat-but-noisy or long-gentle cell
+# below this stays "low".
+RELIEF_MIN_M = 5.0
+# Relief window radius in cells (~50 m at ~10 m px → 5-cell box) — the scale of an
+# actual 急傾斜地 face.
+_RELIEF_RADIUS = 2
 
 
-def slope_level(slope_deg: float) -> str:
+def slope_level(slope_deg: float, relief_m: float = float("inf")) -> str:
+    """Level from slope angle, gated by local relief (≥5 m scarp) per the legal
+    急傾斜地 criterion (slope AND height). Relief defaults to ∞ (ungated) for
+    callers that only have the angle."""
+    if relief_m < RELIEF_MIN_M:
+        return "low"
     if slope_deg >= SLOPE_HIGH_DEG:
         return "high"
     if slope_deg >= SLOPE_MED_DEG:
@@ -69,6 +76,18 @@ def compute_slope_deg(elev: np.ndarray, px_real: float) -> np.ndarray:
     gy, gx = np.gradient(elev.astype(np.float64), px_real)
     grad = np.hypot(gx, gy)  # rise/run magnitude of steepest ascent
     return np.degrees(np.arctan(grad)).astype(np.float32)
+
+
+def compute_relief_m(elev: np.ndarray, radius: int = _RELIEF_RADIUS) -> np.ndarray:
+    """Local relief (max−min elevation, m) over a (2·radius+1)² window — the scarp
+    height proxy for the 急傾斜地 ≥5 m gate. NaN where the window has no data."""
+    if elev.size == 0:
+        return np.full(elev.shape, np.nan, dtype=np.float32)
+    from scipy import ndimage
+    size = 2 * radius + 1
+    hi = ndimage.maximum_filter(elev, size=size, mode="nearest")
+    lo = ndimage.minimum_filter(elev, size=size, mode="nearest")
+    return (hi - lo).astype(np.float32)
 
 
 LANDSLIDE_SUSC_SOURCE_ID = "gsi-dem-slope"
@@ -115,6 +134,7 @@ def apply_landslide_susceptibility(
     # mercator px → real ground metres (×cos lat) so slope angles are physical.
     px_real = px * math.cos(math.radians((minlat + maxlat) / 2))
     slope = compute_slope_deg(elev, px_real)
+    relief = compute_relief_m(elev)  # scarp-height proxy for the ≥5 m gate
     H, W = slope.shape
 
     levels: list[str | None] = []
@@ -129,8 +149,9 @@ def apply_landslide_susceptibility(
             col = row = -1
         if 0 <= row < H and 0 <= col < W and np.isfinite(slope[row, col]):
             d = float(slope[row, col])
+            r = float(relief[row, col]) if np.isfinite(relief[row, col]) else 0.0
             degs.append(d)
-            levels.append(slope_level(d))
+            levels.append(slope_level(d, r))  # gated by ≥5 m relief
             covered.append(True)
         else:
             degs.append(np.nan)
