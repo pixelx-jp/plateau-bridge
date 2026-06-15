@@ -7,7 +7,8 @@ topographic depressions that fill before they spill, so — unlike HAND, which
 fills sinks to extract a river network — this layer KEEPS the depressions and
 measures how deep a sink each building sits in (the filling-and-spilling signal,
 cf. Safer_RAIN HFSA; the depression-based Topographic Control Index family,
-Wu et al. 2019, which outperforms the cell-based TWI for pluvial mapping).
+Huang et al. 2019 (Water 11(10):2115), which outperforms the cell-based TWI for
+pluvial mapping).
 
 Pipeline (per city bbox):
   GSI dem_png mosaic (Web-Mercator metres) → pysheds fill_depressions →
@@ -57,7 +58,7 @@ def compute_pluvial(elev: np.ndarray, px: float, px_real: float):
     ``px`` = mercator pixel size (grid units, for pysheds affine); ``px_real`` =
     real ground metres per pixel (for areas/volumes). Returns two float32 grids
     the shape of ``elev``: potential ponding depth (m, 0 where well-drained) and
-    the depression Topographic Control Index ln(A·√S/V) (NaN where not ponding /
+    the depression Topographic Control Index ln(A·S/V) (NaN where not ponding /
     undefined). NaN nodata in the input stays NaN in both outputs.
     """
     from scipy import ndimage
@@ -115,10 +116,19 @@ def compute_pluvial(elev: np.ndarray, px: float, px_real: float):
         V = ndimage.sum(depth, labels, idx) * cell_area + 1.0  # +1 m³ guards ln/zero
         A = ndimage.maximum(acc, labels, idx) * cell_area
         S = np.maximum(ndimage.mean(slope, labels, idx), 1e-3)
-        tci_per = np.log(np.maximum(A, 1.0) * np.sqrt(S) / V).astype(np.float32)
+        # TCI = ln(A·S/V) with LINEAR slope (Huang et al. 2019, Water 11(10):2115).
+        tci_per = np.log(np.maximum(A, 1.0) * S / V).astype(np.float32)
         lut = np.concatenate([[np.nan], tci_per]).astype(np.float32)
         tci = lut[labels]
         tci[nodata_mask] = np.nan
+        # Conservative single-cell-pit gate (review C6): a 1-cell depression is DEM
+        # noise, not a real basin — drop its ponding so it can't read high/medium.
+        # Only the literal artifact; never demotes a real multi-cell basin (no false
+        # negatives). area = cell count per depression.
+        area = ndimage.sum(np.ones_like(depth), labels, idx)
+        tiny = idx[area < 2]
+        if tiny.size:
+            pond[np.isin(labels, tiny)] = 0.0
     return pond, tci
 
 

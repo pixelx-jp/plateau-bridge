@@ -214,7 +214,7 @@ def inland_flood_susceptibility_columns() -> dict[str, pa.DataType]:
         "inland_flood_susceptibility_covered": pa.bool_(),
         "inland_flood_susceptibility_level": pa.string(),     # low | medium | high
         "inland_flood_susceptibility_pond_m": pa.float32(),   # potential ponding depth (m)
-        "inland_flood_susceptibility_tci": pa.float32(),      # depression TCI ln(A·√S/V), relative
+        "inland_flood_susceptibility_tci": pa.float32(),      # depression TCI ln(A·S/V), relative
         "inland_flood_susceptibility_source_ids": pa.string(),
         "inland_flood_susceptibility_coverage_confidence": pa.string(),
     }
