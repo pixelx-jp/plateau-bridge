@@ -18,7 +18,7 @@ Pipeline (per city bbox):
 
 Level is driven by the building's **potential ponding depth** (rainfall-free,
 cross-city comparable, the directly-interpretable fill-spill measure); the
-relative TCI = ln(A·√S / V) is computed and stored alongside for transparency.
+relative TCI = ln(A·S / V) is computed and stored alongside for transparency.
 Honesty: this ignores the storm-sewer drainage network and all flow dynamics,
 so it can UNDERESTIMATE peak depth; "low" is never "safe". ``fetch`` is
 injectable so tests run offline.
@@ -110,7 +110,9 @@ def compute_pluvial(elev: np.ndarray, px: float, px_real: float):
     tci = np.full(elev.shape, np.nan, dtype=np.float32)
     ponding = depth > _DEPRESSION_EPS_M
     if ponding.any():
-        labels, n = ndimage.label(ponding)
+        # 8-connectivity so a thin diagonal basin is ONE component (not split into
+        # single-cell labels the area<2 gate would wrongly zero).
+        labels, n = ndimage.label(ponding, structure=np.ones((3, 3)))
         cell_area = max(px_real, 1.0) ** 2
         idx = np.arange(1, n + 1)
         V = ndimage.sum(depth, labels, idx) * cell_area + 1.0  # +1 m³ guards ln/zero
